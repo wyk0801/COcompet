@@ -1,0 +1,234 @@
+﻿@{
+    ViewBag.Title = "Recycle";
+    Layout = "~/Views/Shared/_ManagementLayout.cshtml";
+}
+<style type="text/css">
+    table, a, .k-grid-header th.k-header {
+        text-align: center;
+    }
+</style>
+
+<ol class="breadcrumb">
+    <li><a href="/Home/Index" target="_top">首页</a></li>
+    <li><a href="List">知识大赛</a></li>
+    <li class="active">活动阶段回收站</li>
+</ol>
+<div class="container-fluid">
+    <div class="page-header page-header-mini">
+        <h4>活动阶段回收站 <small>Stage information from competition</small></h4>
+        <div class="btn-group btn-group-sm" role="group">
+            <a href="javascipt:void(0)" onclick="DoSelectAll(this)" role="button" checked class="btn btn-default"><span class="glyphicon glyphicon-check"></span> 全选</a>
+            <a href="javascipt:void(0)" onclick="DoDelete()" role="button" class="btn btn-default"><span class="glyphicon glyphicon-trash"></span> 删除</a>
+            <a href="javascipt:void(0)" onclick="DoRecover()" role="button" class="btn btn-default"><span class="glyphicon-align-center"></span> 还原</a>
+        </div>
+    </div>
+    <div class="table-responsive">
+        <div id="toolbar" class="toolbar"></div>
+        <div id="grid"></div>
+    </div>
+</div>
+<script type="text/javascript">
+    var grid;
+    /*
+     * 页面加载
+     **/
+    $(document).ready(function () {
+        BindToolBar();
+        $("input").placeholder();
+        kendo.culture("zh-CN");
+        BindGrid();
+    });
+
+    /*
+     * 绑定工具栏
+     **/
+    var BindToolBar = function () {
+        $("#toolbar").kendoToolBar({
+            items: [ {
+                template: "<input name='txtTitle' id='txtTitle' type='text' placeholder='阶段名称' />",
+                overflow: "never"
+            }, {
+                type: "button", text: "搜索", id: "btnserch", click: function () {
+                    //取值
+                    var keyword = $("#txtTitle").val();
+                    var arr = [];
+
+                    if (keyword) {
+                        arr.push({
+                            logic: "or",
+                            filters: [{
+                                field: "title",
+                                operator: "contains",
+                                value: keyword
+                            }]
+                        });
+                    }
+                    $("#grid").data("kendoGrid").dataSource.filter(arr);
+                }
+            }]
+        });
+
+
+        $('#txtTitle').kendoMaskedTextBox();
+    }
+            /**
+           * 执行全选
+           **/
+    var DoSelectAll = function (e) {
+        if ($(e).attr('checked')) {
+            $(".checkbox").each(function () {
+                $(this).prop("checked", true); //此处设置每行的checkbox选中，必须用prop方法
+            });
+            $(e).html('<span class="glyphicon glyphicon-check"></span> 取消').removeAttr('checked');
+        } else {
+            $(".checkbox").each(function () {
+                $(this).prop("checked", false); //此处设置每行的checkbox不选中，必须用prop方法
+            });
+            $(e).html('<span class="glyphicon glyphicon-check"></span> 全选').attr('checked', 'checked');
+        }
+    }
+    /**
+    * 执行删除
+    **/
+    var DoDelete = function () {
+        var ids = "";
+        var obj = document.getElementsByName("id");
+        for (var o in obj) {
+            if (obj.hasOwnProperty(o)) {
+                if (obj[o].checked) {
+                    ids += obj[o].value + ',';
+                }
+            }
+        }
+        if (ids === "") {
+            alert("请选择数据后执行本次操作!");
+            return;
+        }
+        var ismsg = confirm("您确定要执行删除操作？");
+        if (ismsg) {
+            $.ajax({
+                url: "Delete?ids=" + ids.trim(','),
+                type: "get",
+                success: function (data) {
+                    if (data === "True") {
+                        alert("删除数据成功!");
+                        BindGrid();
+                    } else {
+                        alert("删除数据失败!请联系管理员!");
+                    }
+                }
+            });
+        }
+    }
+    /**
+* 执行还原
+**/
+    function Recover(e) {
+        if (confirm("您确定要还原该大赛阶段吗？")) {
+            $.get("LjDelete?ids=" + e + "&isDel=0",
+                function (data) {
+                    if (data === "True") {
+                        alert('还原大赛阶段成功!');
+                        window.location.reload();
+                    }
+                });
+        } else {
+            alert('执行取消操作');
+        }
+    }
+    var DoRecover = function () {
+        var ids = "";
+        var obj = document.getElementsByName("id");
+        for (var o in obj) {
+            if (obj.hasOwnProperty(o)) {
+                if (obj[o].checked) {
+                    ids += obj[o].value + ',';
+                }
+            }
+        }
+        if (ids === "") {
+            alert("请选择数据后执行本次操作!");
+            return;
+        }
+        var ismsg = confirm("您确定要执行还原操作？");
+        if (ismsg) {
+            $.ajax({
+                url: "LjDelete?ids=" + ids.trim(',')+"&isDel=0",
+                type: "get",
+                success: function (data) {
+                    if (data === "True") {
+                        alert("还原数据成功!");
+                        BindGrid();
+                    } else {
+                        alert("还原数据失败!请联系管理员!");
+                    }
+                }
+            });
+        }
+    }
+    /*
+     *绑定Grid
+     **/
+    var BindGrid = function () {
+        grid = $("#grid").kendoGrid({
+            dataSource: {
+                type: "json",
+                transport: {
+                    read: "GetRecycleStageList"
+                },
+                schema: {
+                    model: {
+                        fields: {
+                            id: { type: "number" },
+                            title: { type: "string" },
+                            ssOrganization: { type: "string" },
+                            isUse: { type: "number" },
+                            sort: { type: "number" },
+                            isDel: { type: "number" }
+                        }
+                    }
+                },
+                pageSize: 15
+            },
+            groupable: false,
+            sortable: true,
+            pageable: {
+                refresh: true,
+                pageSizes: true,
+                buttonCount: 5
+            },
+            columns: [{
+                template: '<input type="checkbox" class="checkbox" value="#=id#" name="id">',
+                title: '',
+                width: 30
+            }, {
+                field: "id",
+                title: "编号",
+                width: 80
+            }, {
+                field: 'title',
+                title: "阶段名称",
+                width: 200
+            }, {
+                field: "group_name",
+                title: "所属组织",
+                width: 120
+            }, {
+                template: '#if(isUse==0) {# 是 #}else{ # 否 # }#',
+                title: "是否启用",
+                width: 120
+            }, {
+                field: "sort",
+                title: "排序",
+                width: 120
+            }, {
+                title: "操作",
+                field: "oprator",
+                template: "<a onclick=\"Recover('#=id#')\" role='button' class=\"k-button k-button-icontext\" href='javascipt:void(0)'><span class=\" \"></span>还原</a>",
+                width: 200
+            }]
+        });
+    }
+
+</script>
+

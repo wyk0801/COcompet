@@ -1,0 +1,234 @@
+﻿@{
+    ViewBag.Title = "List";
+    Layout = "~/Views/Shared/_ManagementLayout.cshtml";
+}
+<ol class="breadcrumb">
+    <li><a href="/Home/Index" target="_top">首页</a></li>
+    <li><a href="List">题库系统</a></li>
+    <li class="active">题库日志</li>
+</ol>
+
+<div class="container-fluid">
+    <div class="page-header page-header-mini">
+        <h4>题库日志 <small>Question log</small></h4>
+        <div class="btn-group btn-group-sm" role="group">
+            <a href="javascript:" role="button" class="btn btn-default" onclick="AllCheck(this)" checked><span class="glyphicon glyphicon-check"></span> 全选</a>
+            <a href="javascript:" role="button" class="btn btn-default" onclick="allDelete()"><span class="glyphicon glyphicon-trash"></span> 删除</a>
+        </div>
+
+    </div>
+    <div class="table-responsive">
+        <div id="toolbar" class="toolbar"></div>
+        <div id="grid"></div>
+    </div>
+</div>
+
+<script>
+
+    /*
+     * 定义变量用于接收grid的结果集
+     **/
+    var grid;
+    /*
+    * 页面加载
+    **/
+    $(document).ready(function () {
+        BindToolBar();
+        $("input").placeholder();
+        kendo.culture("zh-CN");
+        BindGrid();
+
+    });
+    /*
+     * 绑定工具栏
+     **/
+    var BindToolBar = function () {
+        $("#toolbar").kendoToolBar({
+            items: [{
+                template: "<input id='ddlAction' placeholder='动作' />",
+                overflow: "never"
+            }, {
+                template: "<input id='txtsearch' type='text' placeholder='描述' style='width:220px;'>",
+                overflow: "never"
+            }, {
+                type: "button", id: "btnsearch", text: "搜索", click: function () {
+                    var keyword = $("#txtsearch").val();
+                    var ddlAction = $("#ddlAction").val();
+                    var orfilter = { logic: "and", filters: [] };
+                    if (ddlAction) {
+                        orfilter.filters.push({ field: "action", operator: "eq", value: ddlAction });
+                    }
+                    if (keyword)
+                    {
+                        orfilter.filters.push({ field: "description", operator: "contains", value: keyword });
+                    }
+                
+                    if (orfilter.filters.length > 0) {
+                        grid.data("kendoGrid").dataSource.filter(orfilter);
+                    } else {
+                        grid.data("kendoGrid").dataSource.filter({});
+                    }
+                  
+                }
+            }]
+        });
+        $("#ddlAction").kendoDropDownList({
+            optionLabel: "动作",
+            dataTextField: "text",
+            dataValueField: "value",
+            dataSource: [
+            { text: "删除", value: "删除" },
+            { text: "添加", value: "添加" },
+            { text: "修改", value: "修改" }
+            ]
+        });
+
+        $('#txtsearch').kendoMaskedTextBox();
+    }
+    
+    /**
+     * 绑定grid表格
+     */
+
+    var BindGrid = function () {
+        grid = $("#grid").kendoGrid({
+            dataSource: {
+                type: "json",
+                transport: {
+                    read: "GetLogList"
+                },
+                scheme: {
+                    model: {
+                        fields: {
+                            id: { type: "number" },
+                            question_id: { type: "number" },
+                            name: { type: "string" },
+                            user_id: { type: "string" },
+                            description: { type: "string" },
+                            add_time: { type: "date" }
+                        }
+                    }
+                },
+                pageSize: 10
+            },
+            groupable: false,
+            sortable: true,
+            pageable: {
+                refresh: true,
+                pageSizes: true,
+                buttonCount: 5
+            },
+            columns: [
+                {
+                field: '',
+                template: "<input type='checkbox' value='#=id#' class='checkbox'>",
+                title: "",
+                width: 30
+                },
+            {
+                field: "group_id",
+                title: '用户组ID',
+                width: 120
+            }, {
+                field: "question_id",
+                title: '题目编号',
+                width: 120
+            }, {
+                field: "user_id",
+                title: '用户编号',
+                width: 120
+            }, {
+                field: "action",
+                title: '动作',
+           
+                width: 100
+            }, {
+                field: "description",
+                title: '描述',
+                width: 200
+            }, {
+                    field: "Totime",
+                    title: '操作时间',
+                    //format: "{0:yyyy-MM-dd}",
+                    width: 100
+                }
+                , {
+                    title: '操作',
+                    template: "<a  class=\"k-button k-button-icontext\" onclick=\"DoDelete('#=id#')\"><span class=\" \"></span>删除</a>",
+                    width: 150
+                }]
+        });
+    }
+
+   /*
+    * 单个删除
+    **/
+    function DoDelete(e) {
+        var msg = "您真的确定要删除吗？\n\n请确认！";
+        if (confirm(msg) === true) {
+            $.post("deleteLog", { id: e }, function (data) {
+                if (data === "1") {
+                    alert("删除成功");
+                    BindGrid();
+                    $("#grid").data("kendoGrid").refresh();
+                } else {
+                    alert("删除失败");
+                }
+            });
+        } else {
+            return false;
+        }
+        return false;
+    }
+    /*
+     * 当前页面全部选中
+     **/
+    function AllCheck(e) {
+
+        if ($(e).attr('checked')) {
+            $(".checkbox").each(function () {
+                $(this).prop("checked", true); //此处设置每行的checkbox选中，必须用prop方法
+              
+            });
+            $(e).html('<span class="glyphicon glyphicon-check"></span> 取消').removeAttr('checked');
+        } else {
+            $(".checkbox").each(function () {
+                $(this).prop("checked", false); //此处设置每行的checkbox不选中，必须用prop方法
+              
+                $(e).html('<span class="glyphicon glyphicon-check"></span> 全选').attr('checked', 'checked');
+            });
+        }
+    }
+
+    /*
+     * 多个删除
+     **/
+    var ids = [];
+    function allDelete() {
+
+     
+        $(".checkbox").each(function (index, cbx) {
+
+            if (cbx.checked) {
+                ids.push(cbx.value);
+            }
+        });
+
+
+        if (ids.length <= 0) {
+            alert("请选择！");
+            return;
+        }
+        $.post("/Questions/DeleteAllLog?ids=" + ids, function (data) {
+            var result = $.parseJSON(data);
+            var success = result.Success;
+            if (parseInt(success) > 0) {
+                alert("成功删除" + success + "条数据");
+                BindGrid();
+                $("#allcheck").removeClass("k-state-selected");
+                ids.length = 0;
+                $("#grid").data("kendoGrid").refresh();
+            }
+        });
+    }
+</script>

@@ -1,0 +1,189 @@
+﻿@{
+    ViewBag.Title = "ImportQuestion";
+    Layout = "~/Views/Shared/_ManagementLayout.cshtml";
+}
+<ol class="breadcrumb">
+    <li><a href="/Home/Index" target="_top">首页</a></li>
+    <li><a href="ImportQuestion">上传管理</a></li>
+    <li class="active">上传列表</li>
+</ol>
+<div class="container-fluid">
+
+    <div class="tab-content">
+        <div class="form-container">
+            <h4>请选择要导入的Excel文件</h4>
+            <div class="input-group col-sm-4">
+                <input id="txt_Path" type="text" class="form-control">
+                <span id="btn_Browse" style="cursor: pointer;" class="input-group-addon">
+                    <i class="glyphicon glyphicon-folder-open"></i>&nbsp;&nbsp;&nbsp;浏览文件
+                    @using (Html.BeginForm("ImportQuestion", "Import", FormMethod.Post, new { enctype = "multipart/form-data", id = "form_Upload" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        <input id="fileUpload" type="file" name="file" class="form-control" style="position: absolute; left: 0; top: 0; opacity: 0;">
+                        <input id="hid" type="hidden" name="Hidden" value='@Html.ViewBag.TableName' />
+                    }
+                </span>
+            </div>
+            <div class="input-group">
+                <h5>请下载模板填写到模板中执行上传导入!<a id="download" href="javascript:void(0)" onclick="">点击下载模板</a></h5>
+            </div>
+        </div>
+    </div>
+    <div class="page-header page-header-mini">
+        <div class="btn-group btn-group-sm" role="group">
+            <a href="javascript:void(0)" onclick="DoSava()" role="button" class="btn btn-default"><span class="glyphicon  glyphicon-floppy-save"></span> 保存</a>
+            <a href="javascript:void(0)" onclick="selectAll(this)" role="button" class="btn btn-default" checked><span class="glyphicon glyphicon-check"></span>全选</a>
+            <a href="javascript:void(0)" onclick="DodelAll()" role="button" class="btn btn-default"><span class="glyphicon glyphicon-trash"></span> 删除</a>
+        </div>
+    </div>
+    <div class="table-responsive">
+        <div id="toolbar" class="toolbar"></div>
+        <div id="grid"></div>
+    </div>
+</div>
+<script type="text/javascript">
+    $('#fileUpload').change(function () {
+        $('#txt_Path').val($(this).val());
+        $('#form_Upload').submit();
+    });
+    $('#download').click(function () {
+        var url = "/Content/excelTemplate/题库导入模板.xlsx";
+        window.location.href = url;
+    });
+    var state = "@ViewBag.State";//获取执行状态1代表执行过，0代表未执行过
+    var grid;
+    $(document).ready(function () {
+        if (state === "1") {
+            BindGrid();
+        }
+    });
+    /*
+     * 绑定Grid
+     **/
+    var BindGrid = function () {
+        grid = $("#grid").kendoGrid({
+            dataSource: {
+                type: "json",
+                transport: {
+                    read: "BindCacheData"
+                },
+                schema: {
+                    model: {
+                        fields: {
+                            id: { type: "number", field: "id" }
+                        }
+                    }
+                },
+                pageSize: 16
+            },
+            groupable: false,
+            sortable: true,
+            pageable: {
+                refresh: true,
+                pageSizes: true,
+                buttonCount: 5
+            },
+            columns: [
+                {
+                    template: '<input type="checkbox" class="checkbox" name="cId" value="#=id#">',
+                    title: '',
+                    width: 30
+                },
+                {
+                    field: "id",
+                    title: '编号',
+                    width: 80
+                },
+                {
+                    template: '国学',
+                    title: '类别',
+                    width: 120
+                }, {
+                    field: "type_enum",
+                    title: "题型",
+                    width: 120
+                }, {
+                    field: "question",
+                    title: "题干"
+                }, {
+                    field: 'star_level',
+                    title: '难度',
+                    width: 80
+                }, {
+                    field: 'tags',
+                    title: '相关标签',
+                    width: 100
+                }]
+        });
+    }
+
+    /*
+     *全选和全不选
+     **/
+    var questionId = "";
+    var selectAll = function (e) {
+        questionId = "";
+        if ($(e).attr("checked")) {
+
+            $(".checkbox").each(function () {
+                $(this).prop("checked", true);
+            });
+            $(e).html('<span class="glyphicon glyphicon-check"></span> 取消').removeAttr('checked');
+        } else {
+            $(".checkbox").each(function () {
+                $(this).prop("checked", false);
+                $(e).html('<span class="glyphicon glyphicon-check"></span> 全选').attr('checked', "checked");
+            });
+        }
+    }
+
+    var DodelAll = function () {
+        $(".checkbox").each(function (index, element) {
+            if (element.checked) {
+                questionId += element.value + ",";
+            }
+        });
+
+        if (questionId.length === 0) {
+            alert("请选择！");
+            questionId = "";
+            return false;
+        }
+
+        $.ajax({
+            url: "RemoveData",
+            type: "post",
+            async: false,
+            dataType: "json",
+            data: { Querstion: questionId },
+            success: function (data) {
+                alert("成功移除" + data.Success + "条数据");
+                questionId = "";
+                BindGrid();
+            },
+            error: function () {
+                alert("移除出错！");
+            },
+            complete: function () {
+            }
+        });
+    }
+
+    var DoSava = function () {
+        $.ajax({
+            url: "SaveData",
+            type: "post",
+            dataType: "json",
+            async: false,
+            success: function (data) {
+                alert("导入成功" + data.Success + "条数据\n" + ",失败" + data.Failure + "条数据！");
+                location.href = "/Questions/List";
+            },
+            error: function (data) {
+                alert("导入失败！");
+            },
+            complate: function () {
+            }
+        });
+    }
+</script>

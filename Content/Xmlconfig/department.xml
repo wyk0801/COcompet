@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+
+<dataconfig>
+  <!--部门-->
+  <department>
+    <departInfo>
+      <id>1</id>
+      <title>销售部</title>
+    </departInfo>
+    <departInfo>
+      <id>2</id>
+      <title>研发部</title>
+    </departInfo>
+    <departInfo>
+      <id>3</id>
+      <title>售后部</title>
+    </departInfo>
+    <departInfo>
+      <id>4</id>
+      <title>行政部</title>
+    </departInfo>
+    <departInfo>
+      <id>5</id>
+      <title>财务部</title>
+    </departInfo>
+  </department>
+
+  <!--职位-->
+  <position>
+    <departInfo>
+      <id>1</id>
+      <title>总经理</title>
+    </departInfo>
+    <departInfo>
+      <id>2</id>
+      <title>大区经理</title>
+    </departInfo>
+    <departInfo>
+      <id>3</id>
+      <title>区域经理</title>
+    </departInfo>
+    <departInfo>
+      <id>4</id>
+      <title>销售代表</title>
+    </departInfo>
+  </position>
+
+</dataconfig>
+
+
+
+
+

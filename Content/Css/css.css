@@ -1,0 +1,40 @@
+﻿.form-group .right-label{
+    text-align:right;
+    margin-right:20px;
+}
+.user-list-avater {
+                width: 60px;
+                height: 60px;
+            }
+.container-fluid{
+    margin-bottom:50px;
+}
+.k-toolbar div{
+    float:left;
+    margin-top:6px;
+}
+.k-toolbar .k-overflow-anchor{
+    z-index:9999999;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

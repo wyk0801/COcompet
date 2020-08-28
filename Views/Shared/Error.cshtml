@@ -1,0 +1,29 @@
+﻿@model HandleErrorInfo
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+    <title>网页错误</title>
+    <link href="~/Content/error/style.css" rel="stylesheet" />
+</head>
+<body>
+    @*<div class="lose-main">
+            <div class="lose-box">
+                <img src="~/Content/error/pic1.png" />
+                <p>抱歉，没有找到您请求的页面</p>
+                <p class="lose-en">Sorry, didn't find the page you requet.</p>
+                <a href="../Account/Start">返回首页</a>
+            </div>
+        </div>*@
+    <hgroup>
+        <h1>@Model.Exception.Message</h1>
+        <h2>@Model.ControllerName/@Model.ActionName</h2>
+        <h3>@Model.Exception.StackTrace</h3>
+    </hgroup>
+</body>
+</html>

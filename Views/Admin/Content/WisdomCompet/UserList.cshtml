@@ -1,0 +1,178 @@
+﻿@{
+    ViewBag.Title = "UserList";
+    Layout = "~/Views/Shared/_ManagementLayout.cshtml";
+}
+<ol class="breadcrumb">
+    <li><a href="/Home/Index" target="_top">首页</a></li>
+    <li><a href="List">知识大赛</a></li>
+    <li class="active">人员信息</li>
+</ol>
+
+<div class="container-fluid">
+    <div class="page-header page-header-mini">
+        <h4>大赛人员信息统计 <small>User information from competition</small></h4>
+    </div>
+    <div class="table-responsive">
+        <div id="toolbar" class="toolbar"></div>
+        <div id="grid"></div>
+    </div>
+<script type="text/javascript">
+
+    var grid;
+    $(document).ready(function () {
+        BindToolBar();
+        $("input").placeholder();
+        kendo.culture("zh-CN");
+        BindGrid();
+    });
+
+    var BindGrid = function() {
+            
+        grid = $("#grid").kendoGrid({
+            dataSource:
+            {
+                type: "json",
+                transport: {
+                    read: "CompetUsers"
+                },
+                schema: {
+                    model: {
+                        fields: {
+                            compet_id: { type: "number" },
+                            title: { type: "string" },
+                            state: { type: "number" },
+                            region_limit: { type: "number" },
+                            max_persons: { type: "number" }
+                        }
+                    }
+                },
+                pageSize: 10
+            },
+            //height: 550,
+            groupable: false,
+            sortable: true,
+            pageable: {
+                refresh: true,
+                pageSizes: true,
+                buttonCount: 5
+            },
+            columns: [
+                {
+                    field: "compet_id",
+                    title: "编号",
+                    width: 60
+                }, {
+                    field: 'title',
+                    title: "大赛",
+                    width: 140
+                }, {
+                    field: "state",
+                    title: "状态",
+                    width: 80,
+                    values: [
+                        { text: "正常", value: 1 },
+                        { text: "冻结", value: 0 }]
+                }, {
+                    field: "region_limit",
+                    title: "规模",
+                    width: 90,
+                    values: [
+                        { text: "全国", value: "1" },
+                        { text: "全省", value: "2" },
+                        { text: "全市", value: "3" },
+                        { text: "县区", value: "4" },
+                        { text: "内部", value: "5" }
+                    ]
+                }, {
+                    title: "人数限制",
+                    template: '#if(max_persons==0) {# 不限 #}else{ # #=max_persons# 人 # }#',
+                    width: 100
+                },
+                {
+                    title: "操作",
+                    template: "<a href='StageDetails?competId=#=compet_id#' class=\"k-button k-button-icontext\"></span>查看详情</a>",
+                    width: 100
+                }]
+        });
+    }
+
+    var BindToolBar = function() {
+            
+        $("#toolbar").kendoToolBar({
+            items: [{
+                template: "<input id='ddlState' placeholder='大赛状态' />",
+                overflow: "never"
+            }, {
+                template: "<input id='ddlRegion' placeholder='大赛规模' />",
+                overflow: "never"
+            }, {
+                template: "<input id='txtBegintime' name='txtBegintime' placeholder='开赛时间'>",
+                overflow: "never"
+            }, {
+                template: "<input id='txtEndtime' name='txtEndtime' placeholder='结束时间'>",
+                overflow: "never"
+            }, {
+                template: "<input id='txtTitle' name='txtTitle' placeholder='请输入大赛名称' />",
+                overflow: "never"
+            }, {
+                type: "button", text: "搜索", click: function () {
+                    var orfilter = { logic: "and", filters: [] };
+                    var ddlState = $("#ddlState").val();//大赛状态
+                    var txtTitle = $('#txtTitle').val();//大赛名称
+                    var ddlRegion = $('#ddlRegion').val();//规模
+                    var txtBegintime = $('#txtBegintime').val();//开始
+                    var txtEndtime = $('#txtBegintime').val();//结束
+
+                    if (ddlState) {
+                        orfilter.filters.push({ field: "state", operator: "eq", value: parseInt(ddlState) });
+                    }
+                    if (txtTitle) {
+                        orfilter.filters.push({ field: "title", operator: "contains", value: txtTitle });
+                    }
+                    if (ddlRegion) {
+                        orfilter.filters.push({ field: "region_limit", operator: "eq", value: parseInt(ddlRegion) });
+                    }
+                    if (txtBegintime) {
+                        orfilter.filters.push({ field: "begin_time", operator: "lte", value: Date.parse(txtBegintime) });
+                    }
+                    if (txtEndtime) {
+                        orfilter.filters.push({ field: "end_time", operator: "gte", value: Date.parse(txtEndtime) });
+                    }
+                    if (orfilter.filters.length > 0) {
+                        grid.data("kendoGrid").dataSource.filter(orfilter);
+                    } else {
+                        grid.data("kendoGrid").dataSource.filter({});
+                    }
+                }
+            }]
+        });
+        $("#ddlState").kendoDropDownList({
+            optionLabel: "状态选择",
+            dataTextField: "text",
+            dataValueField: "value",
+            dataSource: [
+                { text: "正常", value: "1" },
+                { text: "冻结", value: "0" }
+            ]
+        });
+
+        $("#ddlRegion").kendoDropDownList({
+            dataTextField: "text",
+            dataValueField: "value",
+            optionLabel: '大赛规模',
+            dataSource: [
+                { text: "全国", value: "1" },
+                { text: "全省", value: "2" },
+                { text: "全市", value: "3" },
+                { text: "全县、区", value: "4" },
+                { text: "内部", value: "5" }
+            ]
+        });
+
+        $("#txtBegintime").kendoDatePicker({ format: 'yyyy-MM-dd' });
+        $("#txtEndtime").kendoDatePicker({ format: 'yyyy-MM-dd' });
+        $('#txtTitle').kendoMaskedTextBox();
+    }
+</script>
+</div>
+

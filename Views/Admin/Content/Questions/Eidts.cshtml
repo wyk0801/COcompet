@@ -1,0 +1,197 @@
+﻿@{
+    ViewBag.Title = "Eidts";
+    Layout = "~/Views/Shared/_ManagementLayout.cshtml";
+}
+@model ChuanYuan.Model.questions
+
+<link href="/Content/Bootstrap/css/bootstrap-tokenfield.min.css" rel="stylesheet">
+<link href="/Content/icheck/skins/square/blue.css" rel="stylesheet">
+<script src="/Scripts/Jquery/jquery-ui.min.js"></script>
+<script src="/Scripts/Bootstrap/bootstrap-tokenfield.min.js"></script>
+<script src="/Scripts/Jquery/jquery.icheck.min.js"></script>
+
+<ol class="breadcrumb">
+    <li><a href="/admin/">首页</a></li>
+    <li><a href="List">题库管理</a></li>
+    <li class="active">题目编辑</li>
+</ol>
+<div class="container-fluid">
+    <div class="page-header page-header-mini">
+        编辑题目
+    </div>
+    <form class="form-horizontal" action="Eidts" method="POST">
+        <div class="form-group">
+            <label for="txt_question" class="col-sm-2 control-label">题干</label>
+            <div class="col-sm-4">
+                @*<input type="text" class="form-control" id="txt_question" name="txt_question" placeholder="题干" value="@Model.question">*@
+                @Html.TextBoxFor(m => m.question, new { @id = "txt_question", @name = "txt_question", @placeholder = "题干", @class = "form-control" })
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="sel_type" class="col-sm-2 control-label">类别</label>
+            <div class="col-sm-4">
+                @*<input type="text" id="sel_type" name="sel_type" placeholder="请选择题目类别" value="@Model.type_id">*@
+                @Html.TextBoxFor(m => m.type_id, new { @id = "sel_type", @name = "sel_type", @placeholder = "请选择题目类别" })
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="sel_type_enum" class="col-sm-2 control-label">题型</label>
+            <div class="col-sm-4">
+                @*<input type="text" id="sel_type_enum" name="sel_type_enum" placeholder="请选择题型" value="@Model.type_enum">*@
+                @Html.TextBoxFor(m => m.type_enum, new { @id = "sel_type_enum", @name = "sel_type_enum", @placeholder = "请选择题型" })
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="sel_read_level" class="col-sm-2 control-label">阅读级别</label>
+            <div class="col-sm-4">
+                @*<input type="number" id="sel_read_level" name="sel_read_level" value="@Model.read_level">*@
+                @Html.TextBoxFor(m => m.read_level, new { @id = "sel_read_level", @name = "sel_read_level" })
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="txt_price" class="col-sm-2 control-label">价格</label>
+            <div class="col-sm-4">
+                @*<input type="number" id="txt_price" name="txt_price" placeholder="入库数量" value="@Model.price">*@
+                @Html.TextBoxFor(m => m.price, new { @id = "txt_price", @name = "txt_price", @placeholder = "入库数量" })
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="sel_star_level" class="col-sm-2 control-label">难度</label>
+            <div class="col-sm-4">
+                @*<input type="text" id="sel_star_level" name="sel_star_level" placeholder="难度选择" value="@Model.star_level">*@
+                @Html.TextBoxFor(m => m.star_level, new { @id = "sel_star_level", @name = "sel_star_level", @placeholder = "难度选择", @class = "form-control" })
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="txt_score" class="col-sm-2 control-label">分值</label>
+            <div class="col-sm-4">
+                @*<input type="number" id="txt_score" name="txt_score" placeholder="分值" value="@Model.score">*@
+                @Html.TextBoxFor(m => m.score, new { @id = "txt_score", @name = "txt_score", @placeholder = "分值" })
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="txt_link_url" class="col-sm-2 control-label">链接地址</label>
+            <div class="col-sm-4">
+                @*<input type="text" class="form-control" id="txt_link_url" name="txt_link_url" placeholder="请输入题目相关链接地址" value="@Model.link_url">*@
+                @Html.TextBoxFor(m => m.link_url, new { @id = "txt_link_url", @name = "txt_link_url", @placeholder = "请输入题目相关链接地址", @class = "form-control" })
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="txt_tags" class="col-sm-2 control-label">相关标签</label>
+            <div class="col-sm-4">
+                @*<input type="text" id="txt_tags" name="txt_tags" data-role="tagsinput" placeholder="回车添加标签" value="@Model.tags" />*@
+                @Html.TextBoxFor(m => m.tags, new { @id = "txt_tags", @name = "txt_tags", @placeholder = "请输入题目相关标签" })
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="txt_options_1" class="col-sm-2 control-label">答案选项</label>
+            <div class="col-sm-4">
+                <div class="input-group">
+                    <span class="input-group-addon">A</span>
+                    <input type="text" id="txt_options_1" name="txt_options_1" class="form-control" placeholder="选项1">
+                    <span class="input-group-addon addon-mini-padding"><input type="radio" id="rad_options_1" name="question_options" checked="checked" value="1"></span>
+                </div>
+                <br>
+                <div class="input-group">
+                    <span class="input-group-addon">B</span>
+                    <input type="text" id="txt_options_2" name="txt_options_2" class="form-control" placeholder="选项2">
+                    <span class="input-group-addon addon-mini-padding"><input type="radio" id="rad_options_2" name="question_options" value="2"></span>
+                </div>
+                <br>
+                <div class="input-group">
+                    <span class="input-group-addon">C</span>
+                    <input type="text" id="txt_options_3" name="txt_options_3" class="form-control" placeholder="选项3">
+                    <span class="input-group-addon addon-mini-padding"><input type="radio" id="rad_options_3" name="question_options" value="3"></span>
+                </div>
+                <br>
+                <div class="input-group">
+                    <span class="input-group-addon">D</span>
+                    <input type="text" id="txt_options_4" name="txt_options_4" class="form-control" placeholder="选项4">
+                    <span class="input-group-addon addon-mini-padding"><input type="radio" id="rad_options_4" name="question_options" value="4"></span>
+                </div>
+                <br>
+            </div>
+        </div>
+        <input type="hidden" value="@Html.Raw(ViewBag.option)" id="hidoption" />
+        <input type="hidden" value="@Html.Raw(ViewBag.optionId)" name="opid" />
+        @Html.HiddenFor(m => m.question_id)
+        @Html.HiddenFor(m => m.add_time)
+        @Html.HiddenFor(m => m.hits)
+        @Html.HiddenFor(m => m.status)
+        @Html.HiddenFor(m => m.issue_time)
+        <div class="fixed-bottom container-submit">
+            <button type="submit" class="btn btn-primary">提交保存</button>
+            <button type="button" onclick="javascript: history.back(-1);" class="btn btn-warning">返回</button>
+        </div>
+
+        <script>
+            $(document).ready(function () {
+                /*选择题目类别*/
+                $("#sel_type").kendoDropDownList({
+                    dataTextField: "text",
+                    dataValueField: "value",
+                    dataSource: {
+                        transport: {
+                            read: {
+                                url: "GetQuestionsList",
+                                dataType: "json"
+                            }
+                        }
+                    },
+                    index: 0
+                });
+
+                /*选择题型*/
+                $("#sel_type_enum").kendoDropDownList({
+                    dataTextField: "text",
+                    dataValueField: "value",
+
+                    dataSource: {
+                        transport: {
+                            read: {
+                                dataType: "json",
+                                url: "ProblemType"
+                            }
+                        }
+                    },
+
+                    index: 0
+                });
+
+                /*选择题型*/
+                $("#sel_star_level").kendoDropDownList({
+                    dataTextField: "text",
+                    dataValueField: "value",
+                    dataSource: {
+                        transport: {
+                            read: {
+                                dataType: "json",
+                                url: "ProblemDifficulty"
+                            }
+                        }
+                    },
+                    index: 1
+                });
+
+                $('#txt_tags').tokenfield();
+                $("#sel_read_level").kendoNumericTextBox({ format: "0 级", step: 1, min: 1, max: 10 });
+                $("#txt_price").kendoNumericTextBox({ format: "#.00 元", min: 0 });
+                $("#txt_score").kendoNumericTextBox({ format: "#分", min: 0, step: 5 });
+                $("[name='question_options']").iCheck({
+                    checkboxClass: 'icheckbox_square-blue',
+                    radioClass: 'iradio_square-blue',
+                    increaseArea: '20%'
+                });
+
+                var option = $('#hidoption').val();
+                var json = eval('(' + option + ')');
+                $.each(json, function (index, o) {
+                    $('#txt_options_' + o.key).val(o.value);
+                    if (o.isright === "yes") {
+                        $('#rad_options_' + o.key).iCheck('check');
+                    }
+                });
+            });
+        </script>
+    </form>
+</div>

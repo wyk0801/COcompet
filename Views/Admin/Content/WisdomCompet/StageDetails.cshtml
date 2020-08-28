@@ -1,0 +1,78 @@
+﻿@{
+    ViewBag.Title = "StageDetails";
+    Layout = "~/Views/Shared/_ManagementLayout.cshtml";
+}
+
+@using ChuanYuan.Common
+<ol class="breadcrumb">
+    <li><a href="/Home/Index" target="_top">首页</a></li>
+    <li><a href="List">知识大赛</a></li>
+    <li><a href="UserList">人员信息</a></li>
+    <li class="active">用户详情</li>
+</ol>
+
+<div class="container-fluid">
+    <div class="page-header page-header-mini">
+        <h4>大赛阶段详情 <small>Competitor of details</small></h4>
+    </div>
+    <div class="table-responsive">
+        <div id="toolbar" class="toolbar"></div>
+        <div id="grid"></div>
+    </div>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            /**
+             * [items description]
+             */
+            var grid = $("#grid").kendoGrid({
+                dataSource: {
+                    type: "json",
+                    transport: {
+                        read: "CompetStageDetails?competId=" + "@ViewBag.competId"
+                    },
+                    schema: {
+                        model: {
+                            fields: {
+                                compet_id: { type: "number" },
+                                exam_type: { type: "string" },
+                                title: { type: "string" },
+                                count: { type: "number" },
+                                sort: { type: "sort" }
+                            }
+                        }
+                    },
+
+                    pageSize: 15
+                },
+                groupable: false,
+                sortable: true,
+                pageable: {
+                    refresh: true,
+                    pageSizes: true,
+                    buttonCount: 5
+                },
+                columns: [ {
+                    field: "title",
+                    title: "大赛阶段",
+                    width: 80
+                }, {
+                    field: "count",
+                    title: "参与人数",
+                    width: 80
+                }, {
+                    title: "操作",
+                    //template: "<a href='UserDetails?competId=#=compet_id#' class=\"k-button k-button-icontext\"></span>查看详情</a>",
+                    template: "<a href='UserDetails?competId=#=compet_id#&exam_type=#=exam_type#' class=\"k-button k-button-icontext\"></span>查看详情</a>",
+                    width: 100
+                }]
+            });
+            $("#toolbar").kendoToolBar({
+                items: [{
+                    type: "button", text: "返回上一页", click: function () {
+                        window.history.go(-1);
+                    }
+                }]
+            });
+        });
+    </script>
+</div>

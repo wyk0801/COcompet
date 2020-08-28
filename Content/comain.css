@@ -1,0 +1,40 @@
+﻿body {	/*padding-top: 52px;*/ }
+
+/*******/
+.navbar-nav>li>a { font-size: 16px; padding-top: 14px; padding-bottom: 14px; }
+.page-header-mini { margin-top: 5px; margin-bottom: 10px; }
+
+/*******/
+.no-padding { padding: 0; }
+.no-margin { margin: 0; }
+.no-radius { border-radius: 0; }
+.no-broder { border: 0; }
+.full-height { height: 100%; }
+.fixed-bottom { position: fixed; bottom: 0; }
+:-ms-input-placeholder.token-input { color: #999; }
+.input-group-addon.addon-mini-padding { padding: 5px; }
+
+/*******/
+.side-bar { }
+.side-bar-title { padding: 8px 15px; list-style: none; background: #eee; text-align: center; }
+.side-bar-title.has-border { border-top: 1px solid #ddd; }
+
+/*******/
+.menu { display: block; margin: 0; padding: 0; list-style: none; }
+.menu.panel { border-radius: 0; border: 0; }
+.menu-title { padding: 6px 13px; list-style: none; background: #f5f5f5; text-align: left; font-weight: normal; border-top: 1px solid #ddd; }
+.menu-body { line-height: 30px; }
+.menu-body>ul { list-style: none; border: 0; }
+
+/*******/
+iframe.iframe1 { position: absolute; top: 0; left: 0; right: 0; bottom: 0; width: 100%; height: 100%; }
+.container-iframe { height: 100%; border-left: 1px solid #ccc; }
+.container-main { position: absolute; top: 0px; left: 0; right: 0; bottom: 0; }
+
+/*******/
+.container-submit { bottom: 20px; }
+
+/*******/
+.toolbar { margin-bottom: 5px; }
+
+/*******************************************************************************/

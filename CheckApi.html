@@ -1,0 +1,1069 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>co-api测试</title>
+    <script src="Scripts/jquery-1.8.2.min.js"></script>
+    <style type="text/css">
+        div {
+            padding: 20px 10px;
+            margin: 5px auto;
+            width: 900px;
+            border: 1px solid #0094ff;
+            background-color: #f3f9fc;
+        }
+
+            div.Alternating {
+                border: 1px solid #086fa3;
+                background-color: #ddf1fb;
+            }
+
+        textarea {
+            height: 413px;
+            width: 682px;
+        }
+    </style>
+
+    <script type="text/javascript">
+
+        function co_user_add() {
+            $.ajax({
+                url: "/API/Account/Express",
+                type: "post",
+                dataType: 'json',
+                crossDomain: true,
+                data: {
+                  
+                        "head": {
+                            "method": "co.users.add",
+                            "app_id": "co001",
+                            "timestamp": "2017-03-30 14:3000",
+                            "format": "json",
+                            "version": 1.0,
+                            "terminal_type": "web"
+                        },
+                        "param": {
+                            //"user_id": "wangmingyou",
+                            //"password": "123456",
+                            //"group_id": "cykj",
+                            //"email": "derekzhou2015@gmial.com",
+                            //"realName": "奋斗在晨光中",
+                            //"gender": "男",
+                            //"birthday": "1983-02-24",
+                            //"mobile_phone": "13917547886"
+                            "user_id": "17621883315",
+                            "password": "17621883315",
+                            "email": "",
+                            "avatar": "../../Content/images/cover/26.jpg",
+                            "realName": "17621883315",
+                            "gender": "",
+                            "birthday": "",
+                            "mobile_phone": "17621883315",
+                            "province_id": 9,
+                            "city_id": 73,
+                            "school": "",
+                            "grade": "",
+                            "classes": "",
+                            "units": "川远科技",//$("#homecity_name").val(),
+                            "address": "",
+                            "group_id": "cykj",//$("#cityid").val(),
+                            "compet_id": "EBAB4009926AB811",
+                            "form": "镇/区,学校,姓名#松江区,科技,小#43,44,45"
+                        }
+                  
+
+                },
+                success: function (data) {
+                    console.log(data);
+                }
+
+            });
+
+
+        }
+
+        function co_users_login() {
+            $.ajax({
+                url: "/API/Account/Express",
+                type: "post",
+                dataType: 'json',
+                crossDomain: true,
+                data: {
+                   
+                        "head": {
+                            "method": "co.users.login",
+                            "app_id": "co001",
+                            "timestamp": "2017-03-30 14:3000",
+                            "format": "json",
+                            "version": 1.0,
+                            "terminal_type": "web"
+                        },
+                        "param": {
+                            "user_id": "wangmingyou",
+                            "password": "123456",
+                            "group_id": "cykj"
+                        }
+
+                    
+
+                },
+                success: function (data) {
+                    console.log(data);
+                }
+
+            });
+
+
+        }
+
+        function co_users_exists() {
+
+            $.ajax({
+                url: "/API/Account/Express",
+                type: "post",
+                dataType: 'json',
+                crossDomain: true,
+                data: {
+                   
+                        "head": {
+                            "method": "co.users.exists",
+                            "app_id": "co001",
+                            "timestamp": "2017-03-30 14:3000",
+                            "format": "json",
+                            "version": 1.0,
+                            "terminal_type": "web"
+                        },
+                        "param": {
+                            "property": "mobile_phone",
+                            "value": "13917547885"
+                        }
+
+                   
+
+                },
+                success: function (data) {
+                    var result = eval('(' + data + ')');
+
+                    console.log(result.head.msg);
+                    console.log(data);
+                }
+
+            });
+
+
+        }
+
+        function co_users_update() {
+
+            $.ajax({
+                url: "/API/Account/Express",
+                type: "post",
+                dataType: 'json',
+                crossDomain: true,
+                data: {
+                  
+                        "head": {
+                            "method": "co.users.update",
+                            "app_id": "co001",
+                            "timestamp": "2017-03-30 14:3000",
+                            "format": "json",
+                            "version": 1.0,
+                            "terminal_type": "web"
+                        },
+                        "param": {
+                            "user_id": "wangmingyou",
+                            "group_id": "cykj",
+                            "email": "derekzhou2015@gmial.com",
+                            "realName": "奋斗在晨光中",
+                            "gender": "男",
+                            "birthday": "1983-02-24",
+                            "mobile_phone": "13917547886"
+
+                        }
+                    
+
+                },
+                success: function (data) {
+                    console.log(data);
+                }
+
+            });
+        }
+
+        function co_users_update_form_value() {
+
+            $.ajax({
+                url: "/API/Account/Express",
+                type: "post",
+                dataType: 'json',
+                crossDomain: true,
+                data: {
+
+                    "head": {
+                        "method": "co.users.updateuserformvalue",
+                        "app_id": "co001",
+                        "timestamp": "2017-03-30 14:3000",
+                        "format": "json",
+                        "version": 1.0,
+                        "terminal_type": "web"
+                    },
+                    "param": {
+                        //"user_id": "wangmingyou",
+                        //"group_id": "cykj",
+                        //"email": "derekzhou2015@gmial.com",
+                        //"realName": "奋斗在晨光中",
+                        //"gender": "男",
+                        //"birthday": "1983-02-24",
+                        //"mobile_phone": "13917547886"
+                        "user_id": "17621883315",
+                        "password": "17621883315",
+                        "email": "",
+                        "avatar": "../../Content/images/cover/26.jpg",
+                        "realName": "17621883315",
+                        "gender": "",
+                        "birthday": "",
+                        "mobile_phone": "17621883315",
+                        "province_id": 9,
+                        "city_id": 73,
+                        "school": "",
+                        "grade": "",
+                        "classes": "",
+                        "units": "川远科技",//$("#homecity_name").val(),
+                        "address": "",
+                        "group_id": "cykj",//$("#cityid").val(),
+                        "compet_id": "EBAB4009926AB811",
+                        "form": "镇/区,学校,姓名#松江区,川远科技,小六#43,44,45"
+                    }
+
+
+                },
+                success: function (data) {
+                    console.log(data);
+                }
+
+            });
+        }
+        function co_users_password() {
+
+            $.ajax({
+                url: "/API/Account/Express",
+                type: "post",
+                dataType: 'json',
+                crossDomain: true,
+                data: {
+                  
+                        "head": {
+                            "method": "co.users.password",
+                            "app_id": "co001",
+                            "timestamp": "2017-03-30 14:3000",
+                            "format": "json",
+                            "version": 1.0,
+                            "terminal_type": "web"
+                        },
+                        "param": {
+                            "user_id": "wangmingyou",
+                            "password": "123456",
+                            "new_password": "234567"
+
+                        }
+                    
+
+                },
+                success: function (data) {
+                    console.log(data);
+                }
+
+            });
+        }
+
+        function co_users_avatar() {
+
+            $.ajax({
+                url: "/API/Account/Express",
+                type: "post",
+                dataType: 'json',
+                crossDomain: true,
+                data: {
+                  
+                        "head": {
+                            "method": "co.users.avatar",
+                            "app_id": "co001",
+                            "timestamp": "2017-03-30 14:3000",
+                            "format": "json",
+                            "version": 1.0,
+                            "terminal_type": "web"
+                        },
+                        "param": {
+                            "user_id": "wangmingyou",
+                            "avatar": ""
+
+                        }
+                    
+
+                },
+                success: function (data) {
+                    console.log(data);
+                }
+
+            });
+        }
+
+        function co_users_logout() {
+            $.ajax({
+                url: "/API/Account/Express",
+                type: "post",
+                dataType: 'json',
+                crossDomain: true,
+                data: {
+                   
+                        "head": {
+                            "method": "co.users.logout",
+                            "app_id": "co001",
+                            "timestamp": "2017-03-30 14:3000",
+                            "format": "json",
+                            "version": 1.0,
+                            "terminal_type": "web"
+                        },
+                        "param": {
+                            "user_id": "wangmingyou"
+                        }
+                    
+
+                },
+                success: function (data) {
+                    console.log(data);
+                }
+
+            });
+        }
+
+        /*
+         *考试
+         **/
+        function co_compet_Info() {
+
+            $.ajax({
+                url: "/API/Exam/Express",
+                type: "post",
+                dataType: "json",
+                crossDomain: true,
+                data: {
+                    "head": {
+                        "method": "co.compet.info",
+                        "app_id": "co001",
+                        "timestamp": "2017-03-30 14:3000",
+                        "format": "json",
+                        "version": 1.0,
+                        "terminal_type": "web"
+                    },
+                    "param": {
+                        "compet_id": 44
+                    }
+                },
+                success: function(data) {
+                      console.log(data);
+                }
+            });
+        }
+
+        function co_compet_subpaper() {
+
+            $.ajax({
+                url: "/API/Exam/Express",
+                type: "post",
+                dataType: "json",
+                crossDomain: true,
+                data: {
+                    "head": {
+                        "method": "co.compet.subpaper",
+                        "app_id": "co001",
+                        "timestamp": "2017-03-30 14:3000",
+                        "format": "json",
+                        "version": 1.0,
+                        "terminal_type": "web"
+                    },
+                    "param": {
+                        "exam_id": 1,
+                        "exam_type": "YUANSHI"
+                    }
+                },
+                success: function(data) {
+                    console.log(data);
+                }
+            });
+        }
+
+        function co_compet_scoreresult() {
+
+            $.ajax({
+                url: "/API/Exam/Express",
+                type: "post",
+                dataType: "json",
+                crossDomain: true,
+                data: {
+                    "head": {
+                        "method": "co.compet.scoreresult",
+                        "app_id": "co001",
+                        "timestamp": "2017-03-30 14:3000",
+                        "format": "json",
+                        "version": 1.0,
+                        "terminal_type": "web"
+                    },
+                    "param": {
+                        "user_id": "wangmingyou"
+                    }
+                },
+                success: function(data) {
+                    console.log(data);
+                }
+            });
+        }
+
+        function co_compet_scoreresult() {
+
+            $.ajax({
+                url: "/API/Exam/Express",
+                type: "post",
+                dataType: "json",
+                crossDomain: true,
+                data: {
+                    "head": {
+                        "method": "co.compet.scoreresult",
+                        "app_id": "co001",
+                        "timestamp": "2017-03-30 14:3000",
+                        "format": "json",
+                        "version": 1.0,
+                        "terminal_type": "web"
+                    },
+                    "param": {
+                        "user_id": "wangmingyou"
+                    }
+                },
+                success: function (data) {
+                    console.log(data);
+                }
+            });
+        }
+
+        /*
+         *题目
+         **/
+
+        function co_problems_list() {
+            $.ajax({
+                url: "/API/Problems/Express",
+                type: "post",
+                dataType: "json",
+                crossDomain: true,
+                data: {
+                    "head": {
+                        "method": "co.problems.list",
+                        "app_id": "co001",
+                        "timestamp": "2017-03-30 14:3000",
+                        "format": "json",
+                        "version": 1.0,
+                        "terminal_type": "web"
+                    },
+                    "param": {
+                        "count": "100",
+                        //"types": "123",
+                        "type_enum": "MultipleChoice",
+                        //"question": "",
+                        //"tags": "123",
+                        //"letter": "a",
+                        //"read_level": "123",
+                        //"status": "123",
+                        //"issue_time1": "2017-12-23",
+                        //"issue_time2": "2018-11-11",
+                        "is_random": "true"
+                  }
+                },
+                success: function(data) {
+                    console.log(data);
+                    $("body").text(data);
+                }
+            });
+        }
+        
+        //获取我的作品信息
+        function co_production() {
+            $.ajax({
+                url: "/API/Exam/Express",
+                type: "post",
+                dataType: "json",
+                crossDomain: true,
+                data: {
+                    "head": {
+                        "method": "co.compet.production",
+                        "app_id": "co001",
+                        "timestamp": "2017-03-30 14:3000",
+                        "format": "json",
+                        "version": 1.0,
+                        "terminal_type": "web"
+                    },
+                    "param": {
+                        "compet_id": "332",
+                        "cd_id": "3",
+                        "user_id": "123456"
+                    }
+                },
+                success: function (data) {
+                    console.log(data);
+                    alert(data);
+                }
+            });
+        }
+
+        function co_compet_examlist() {
+
+            $.ajax({
+                url: "/API/Exam/Express",
+                type: "post",
+                dataType: "json",
+                crossDomain: true,
+                data: {
+                    "head": {
+                        "method": "co.compet.examlist",
+                        "app_id": "co001",
+                        "timestamp": "2017-03-30 14:3000",
+                        "format": "json",
+                        "version": 1.0,
+                        "terminal_type": "web"
+                    },
+                    "param": {
+                        "compet_id": "40515",
+                        "exam_type": "1",
+                        "user_id": "17621883315",
+                        "tags": "院试"
+                    }
+                },
+                success: function (data) {
+                    console.log(data);
+                }
+            });
+        }
+    </script>
+</head>
+<body>
+    <p style="text-align: center">CO接口测试文档（用户）</p>
+<div>
+    <textarea rows="5">
+            
+        function co_user_add() {
+            $.ajax({
+                url: "/API/Account/Express",
+                type: "post",
+                dataType: 'json',
+                crossDomain: true,
+                data: {
+                  
+                        "head": {
+                            "method": "co.users.add",
+                            "app_id": "co001",
+                            "timestamp": "2017-03-30 14:3000",
+                            "format": "json",
+                            "version": 1.0,
+                            "terminal_type": "web"
+                        },
+                        "param": {
+                            "user_id": "wangmingyou",
+                            "password": "123456",
+                            "group_id": "cykj",
+                            "email": "derekzhou2015@gmial.com",
+                            "realName": "奋斗在晨光中",
+                            "gender": "男",
+                            "birthday": "1983-02-24",
+                            "mobile_phone": "13917547886"
+
+                        }
+                    
+
+                },
+                success: function (data) {
+                    console.log(data);
+                }
+
+            });
+
+
+        }
+
+        </textarea>
+
+    <input type="button" value="co.user.add" onclick="co_user_add()"/>
+</div>
+
+<div>
+    <textarea rows="5">
+         function co_users_login() {
+            $.ajax({
+                url: "/API/Account/Express",
+                type: "post",
+                dataType: 'json',
+                crossDomain: true,
+                data: {
+                  
+                        "head": {
+                            "method": "co.users.login",
+                            "app_id": "co001",
+                            "timestamp": "2017-03-30 14:3000",
+                            "format": "json",
+                            "version": 1.0,
+                            "terminal_type": "web"
+                        },
+                        "param": {
+                            "user_id": "wangmingyou",
+                            "password": "123456",
+                            "group_id": "cykj"
+                        }
+
+                    
+
+                },
+                success: function (data) {
+                    console.log(data);
+                }
+
+            });
+
+
+        }
+    </textarea>
+    <input type="button" value="co.users.login" onclick="co_users_login()"/>
+
+</div>
+
+<div>
+    <textarea rows="5">
+         function co_users_exists() {
+
+            $.ajax({
+                url: "/API/Account/Express",
+                type: "post",
+                dataType: 'json',
+                crossDomain: true,
+                data: {
+                  
+                        "head": {
+                            "method": "co.users.exists",
+                            "app_id": "co001",
+                            "timestamp": "2017-03-30 14:3000",
+                            "format": "json",
+                            "version": 1.0,
+                            "terminal_type": "web"
+                        },
+                        "param": {
+                            "property": "User_ID",
+                            "value": "wangmingyou"
+                        }
+
+                    
+
+                },
+                success: function (data) {
+                    console.log(data);
+                }
+
+            });
+
+
+        }
+    </textarea>
+    <input type="button" value="co.users.exists" onclick="co_users_exists()"/>
+</div>
+
+<div>
+    <textarea rows="5">
+         function co_users_update() {
+
+            $.ajax({
+                url: "/API/Account/Express",
+                type: "post",
+                dataType: 'json',
+                crossDomain: true,
+                data: {
+                  
+                        "head": {
+                            "method": "co.users.update",
+                            "app_id": "co001",
+                            "timestamp": "2017-03-30 14:3000",
+                            "format": "json",
+                            "version": 1.0,
+                            "terminal_type": "web"
+                        },
+                        "param": {
+                            "user_id": "wangmingyou",
+                            "group_id": "cykj",
+                            "email": "derekzhou2015@gmial.com",
+                            "realName": "奋斗在晨光中",
+                            "gender": "男",
+                            "birthday": "1983-02-24",
+                            "mobile_phone": "13917547886"
+
+                        }
+                    
+
+                },
+                success: function (data) {
+                    console.log(data);
+                }
+
+            });
+        }
+    </textarea>
+    <input type="button" value="co.users.update" onclick="co_users_update()"/>
+</div>
+    
+    <div>
+        <textarea rows="5">
+            function co_users_update() {
+
+            $.ajax({
+            url: "/API/Account/Express",
+            type: "post",
+            dataType: 'json',
+            crossDomain: true,
+            data: {
+
+            "head": {
+            "method": "co.users.update",
+            "app_id": "co001",
+            "timestamp": "2017-03-30 14:3000",
+            "format": "json",
+            "version": 1.0,
+            "terminal_type": "web"
+            },
+            "param": {
+            "user_id": "wangmingyou",
+            "group_id": "cykj",
+            "email": "derekzhou2015@gmial.com",
+            "realName": "奋斗在晨光中",
+            "gender": "男",
+            "birthday": "1983-02-24",
+            "mobile_phone": "13917547886"
+
+            }
+
+
+            },
+            success: function (data) {
+            console.log(data);
+            }
+
+            });
+            }
+        </textarea>
+        <input type="button" value="co.users.updateuserformvalue" onclick="co_users_update_form_value()" />
+    </div>
+
+<div>
+    <textarea rows="5">
+          function co_users_password() {
+
+            $.ajax({
+                url: "/API/Account/Express",
+                type: "post",
+                dataType: 'json',
+                crossDomain: true,
+                data: {
+               
+                        "head": {
+                            "method": "co.users.password",
+                            "app_id": "co001",
+                            "timestamp": "2017-03-30 14:3000",
+                            "format": "json",
+                            "version": 1.0,
+                            "terminal_type": "web"
+                        },
+                        "param": {
+                            "user_id": "wangmingyou",
+                            "password": "123456",
+                            "new_password": "234567"
+
+                        }
+                    
+
+                },
+                success: function (data) {
+                    console.log(data);
+                }
+
+            });
+        }
+    </textarea>
+    <input type="button" value="co.users.password" onclick="co_users_password()"/>
+</div>
+
+<div>
+    <textarea rows="5">
+         function co_users_avatar() {
+
+            $.ajax({
+                url: "/API/Account/Express",
+                type: "post",
+                dataType: 'json',
+                crossDomain: true,
+                data: {
+                 
+                        "head": {
+                            "method": "co.users.avatar",
+                            "app_id": "co001",
+                            "timestamp": "2017-03-30 14:3000",
+                            "format": "json",
+                            "version": 1.0,
+                            "terminal_type": "web"
+                        },
+                        "param": {
+                            "user_id": "wangmingyou",
+                            "avatar": ""
+
+                        }
+                    
+
+                },
+                success: function (data) {
+                    console.log(data);
+                }
+
+            });
+        }
+    </textarea>
+    <input type="button" value="co.users.avatar" onclick="co_users_avatar()"/>
+</div>
+
+<div>
+    <textarea rows="5">
+        function co_users_logout() {
+            $.ajax({
+                url: "/API/Account/Express",
+                type: "post",
+                dataType: 'json',
+                crossDomain: true,
+                data: {
+                 
+                        "head": {
+                            "method": "co.users.logout",
+                            "app_id": "co001",
+                            "timestamp": "2017-03-30 14:3000",
+                            "format": "json",
+                            "version": 1.0,
+                            "terminal_type": "web"
+                        },
+                        "param": {
+                            "user_id": "wangmingyou"
+                        }
+                    
+
+                },
+                success: function (data) {
+                    console.log(data);
+                }
+
+            });
+        }
+
+    </textarea>
+    <input type="button" value="co.users.logout" onclick="co_users_logout()"/>
+</div>
+    <p style="text-align: center">CO接口测试文档（考试）</p>
+<div>
+    <textarea rows="5">
+     function co_compet_info(){
+            $.ajax({
+                url: "/API/Exam/Express",
+                type: "post",
+                dataType: "json",
+                crossDomain: true,
+                data: {
+
+                    "head": {
+                        "method": "co.compet.info",
+                        "app_id": "co001",
+                        "timestamp": "2017-03-30 14:3000",
+                        "format": "json",
+                        "version": 1.0,
+                        "terminal_type": "web"
+                    },
+                    "param": {
+                        "compet_id": "wangmingyou"
+                    }
+                }, success: function(data) {
+                      console.log(data);
+                }
+            })
+        }
+    </textarea>
+    <input type="button" value="co.compet.info" onclick="co_compet_Info()" />
+</div>
+
+<div>
+    <textarea rows="5">
+     function co_compet_subpaper(){
+            $.ajax({
+                url: "/API/Exam/Express",
+                type: "post",
+                dataType: "json",
+                crossDomain: true,
+                data: {
+
+                    "head": {
+                        "method": "co.compet.subpaper",
+                        "app_id": "co001",
+                        "timestamp": "2017-03-30 14:3000",
+                        "format": "json",
+                        "version": 1.0,
+                        "terminal_type": "web"
+                    },
+                    "param": {
+                        "exam_id": 1,
+                        "exam_type": "YUANSHI"
+                    }
+                },success: function(data) {
+                      console.log(data);
+                }
+            })
+        }
+    </textarea>
+    <input type="button" value="co.compet.info" onclick="co_compet_subpaper()" />
+</div>
+
+<div>
+    <textarea rows="5">
+     function co_compet_scoreresult(){
+            $.ajax({
+                url: "/API/Exam/Express",
+                type: "post",
+                dataType: "json",
+                crossDomain: true,
+                data: {
+
+                    "head": {
+                        "method": "co.compet.scoreresult",
+                        "app_id": "co001",
+                        "timestamp": "2017-03-30 14:3000",
+                        "format": "json",
+                        "version": 1.0,
+                        "terminal_type": "web"
+                    },
+                   "param": {
+                        "exam_id": 1,
+                        "exam_type": "YUANSHI"
+                    }
+                }, success: function(data) {
+                      console.log(data);
+                }
+            })
+        }
+    </textarea>
+    <input type="button" value="co.compet.info" onclick="co_compet_scoreresult()" />
+</div>  
+    <p style="text-align: center">CO接口测试文档（题目）</p>    
+<div>
+    <textarea rows="5">
+     function co_compet_scoreresult(){
+            $.ajax({
+                url: "/API/Problems/Express",
+                type: "post",
+                dataType: "json",
+                crossDomain: true,
+                data: {
+
+                    "head": {
+                        "method": "co.problems.list",
+                        "app_id": "co001",
+                        "timestamp": "2017-03-30 14:3000",
+                        "format": "json",
+                        "version": 1.0,
+                        "terminal_type": "web"
+                    },
+                   "param": {
+                        "count": "100",
+                        "types": "123",
+                        "type_enum": "MultipleChoice",
+                        "question": "如果不加以教育",
+                        "tags": "123",
+                        "letter": "123",
+                        "read_level": "123",
+                        "status": "123",
+                        "issue_time1": "2017-12-23",
+                        "issue_time2": "2018-11-11",
+                        "is_random": "true"
+                  }
+                }, success: function(data) {
+                      console.log(data);
+                    
+                }
+            })
+        }
+    </textarea>
+    <input type="button" value="co.compet.info" onclick="co_problems_list()" />
+</div>
+<div>
+    <textarea rows="5">
+            function co_production() {
+            $.ajax({
+            url: "/API/Exam/Express",
+            type: "post",
+            dataType: "json",
+            crossDomain: true,
+            data: {
+            "head": {
+            "method": "co.compet.production",
+            "app_id": "co001",
+            "timestamp": "2017-03-30 14:3000",
+            "format": "json",
+            "version": 1.0,
+            "terminal_type": "web"
+            },
+            "param": {
+            "compet_id": "332",
+            "cd_id": "3",
+            "user_id": "123456"
+            }
+            },
+            success: function (data) {
+            console.log(data);
+            alert(data);
+            }
+            });
+            }
+        </textarea>
+
+    <input type="button" value="co_production" onclick="co_production()" />
+</div>
+    <div>
+        <textarea rows="5">
+            function co_compet_examlist() {
+
+            $.ajax({
+            url: "/API/Exam/Express",
+            type: "post",
+            dataType: "json",
+            crossDomain: true,
+            data: {
+            "head": {
+            "method": "co.compet.examlist",
+            "app_id": "co001",
+            "timestamp": "2017-03-30 14:3000",
+            "format": "json",
+            "version": 1.0,
+            "terminal_type": "web"
+            },
+            "param": {
+            "compet_id": "40515",
+            "exam_type": "1",
+            "user_id": "17621883315",
+            "tags": "院试"
+            }
+            },
+            success: function (data) {
+            console.log(data);
+            }
+            });
+            }
+        </textarea>
+
+        <input type="button" value="co_compet_examlist" onclick="co_compet_examlist()" />
+    </div>
+</body>
+</html>

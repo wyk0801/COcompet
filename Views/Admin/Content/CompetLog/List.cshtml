@@ -1,0 +1,178 @@
+﻿@{
+    ViewBag.Title = "List";
+    Layout = "~/Views/Shared/_ManagementLayout.cshtml";
+}
+<ol class="breadcrumb">
+    <li><a href="/Home/Index" target="_top">首页</a></li>
+    <li><a href="List">大赛系统</a></li>
+    <li class="active">大赛日志</li>
+</ol>
+
+<div class="container-fluid">
+    <div class="page-header page-header-mini">
+        <h4>大赛日志 <small>Compet log</small></h4>
+
+        <div class="btn-group btn-group-sm" role="group">
+            <a href="javascript:" role="button" class="btn btn-default" onclick="CheckAll(this)" checked><span class="glyphicon glyphicon-check"></span> 全选</a>
+            <a href="javascript:" role="button" class="btn btn-default" onclick="DoDel()"><span class="glyphicon glyphicon-trash"></span> 删除</a>
+        </div>
+    </div>
+    <div class="table-responsive">
+        <div id="toolbar" class="toolbar"></div>
+        <div id="grid"></div>
+    </div>
+    <script>
+        var grid;
+        $(document).ready(function () {
+
+            BindToolBar();
+            $("input").placeholder();
+            kendo.culture("zh-CN");
+            BindGrid();
+
+        });
+
+        var BindToolBar = function () {
+
+            $("#toolbar").kendoToolBar({
+                items: [
+                    {
+                        template: "<input id='question' type='text' placeholder='" +
+                            "描述/大赛名称/行为" +
+                            "' style='width:220px;'>",
+                        overflow: "never"
+                    }, {
+                        type: "button",
+                        text: "搜索",
+                        "click": function () {
+
+                            var tkey = $("#question").val();
+                            var orfilter = { logic: "or", filters: [] };
+                            orfilter.filters.push({ field: "action_type", operator: "contains", value: tkey });
+                            orfilter.filters.push({ field: "title", operator: "contains", value: tkey });
+                            orfilter.filters.push({ field: "description", operator: "contains", value: tkey });
+                            if (tkey) {
+                                grid.data("kendoGrid").dataSource.filter(orfilter);
+                            } else {
+                                grid.data("kendoGrid").dataSource.filter({});
+                            }
+
+                        }
+                    }
+                ]
+            });
+            $('#question').kendoMaskedTextBox();
+        }
+
+        /*
+         *绑定Grid
+         **/
+        var BindGrid = function () {
+
+            grid = $("#grid").kendoGrid({
+                dataSource: {
+                    type: "json",
+                    transport: {
+                        read: "/Admin/Content/CompetLog/GetCompetLogTojson"
+                    },
+                    schema: {
+                        model: {
+                            fields: {
+                                id: { type: "number" },
+                                title: { type: "string" },
+                                action: { type: "string" },
+                                description: { type: "string" },
+                                login_id: { type: "string" },
+                                add_time: { type: "date" }
+                            }
+                        }
+                    },
+                    pageSize: 10
+                },
+                groupable: false,
+                sortable: true,
+                pageable: {
+                    refresh: true,
+                    pageSizes: true,
+                    buttonCount: 5
+                },
+                columns: [{
+                   template: "<input type='checkbox' value='#=id#'  class='checkbox' name='checks'/>",
+                    title: '',
+                    width: 30
+                }, {
+                    field: "title",
+                    title: "大赛名称",
+                    width: 120
+                }, {
+                    field: "action",
+                    title: "行为类别",
+                    width: 70
+                }, {
+                    field: "description",
+                    title: "描述",
+                    width: 260
+                }, {
+                    field: "add_time",
+                    title: '操作时间',
+                    format: "{0:yyyy-MM-dd HH:mm:ss}",
+                    width: 160
+                }]
+            });
+
+
+          
+        }
+
+
+        /*
+         *全选
+         **/
+        var CheckAll = function (e) {
+
+            if ($(e).attr("checked")) {
+                $(".checkbox").each(function () {
+                    $(this).prop("checked", true);
+                });
+                $(e).html('<span class="glyphicon glyphicon-check"></span> 取消').removeAttr('checked');
+            } else {
+                $(".checkbox").each(function () {
+                    $(this).prop("checked", false);
+                    $(e).html('<span class="glyphicon glyphicon-check"></span> 全选').attr('checked', 'checked');
+                });
+            }
+        }
+
+
+        /*
+         * 全选删除
+         **/
+        var ids = [];
+        var DoDel = function () {
+
+            $(".checkbox").each(function (index, elm) {
+
+                if (elm.checked) {
+                    ids.push(elm.value);
+                }
+            });
+
+            if (ids.length === 0) {
+                alert("请选择！");
+                return false;
+            }
+            var msg = "您确定要删除选中的数据?";
+            if (confirm(msg)) {
+              
+                $.post("/Admin/Content/CompetLog/AllDelele?ids=" + ids, function (data) {
+
+                    var result = eval('(' + data + ')');
+                    alert("成功删除" + result.Succsee + "条数据");
+                    ids.length = 0;
+                    BindGrid();
+                });
+            }
+        }
+    </script>
+
+</div>

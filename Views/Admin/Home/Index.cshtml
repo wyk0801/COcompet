@@ -1,0 +1,185 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <title>@ViewBag.Title</title>
+    <link rel="stylesheet" href="/Content/Bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" href="/Content/Bootstrap/css/bootstrap-theme.css">
+    <link rel="stylesheet" href="/Content/Kendo/kendo.common.min.css" />
+    <link rel="stylesheet" href="/Content/Kendo/kendo.rtl.min.css" />
+    <link rel="stylesheet" href="/Content/Kendo/kendo.default.min.css" />
+    <link rel="stylesheet" href="/Content/Kendo/kendo.bootstrap.min.css" />
+    <link rel="stylesheet" href="/Content/comain.css">
+    <script src="/Scripts/Jquery/jquery-1.11.3.js"></script>
+    <!--[if lt IE 9]>
+    <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <script src="/Scripts/Bootstrap/bootstrap.js"></script>
+    <script src="/Scripts/Kendo/kendo.all.min.js"></script>
+    <script src="/Scripts/Kendo/kendo.messages.zh-CN.js"></script>
+    <script src="~/Scripts/jquery.cookie.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            /**
+             * [导航选中项高亮显示]
+             */
+            $('.nav-events > li').click(function () {
+                $(this).addClass('active').siblings('li').removeClass('active');
+            });
+            $("#panelbar").kendoPanelBar({ expandMode: "single" });
+            //绑定上级导航
+            getNava();
+
+        });
+
+        /*
+        * 获取导航
+        */
+        var getNava = function () {
+            var html = '';
+            $.ajax({
+                url: "GetNavigation",
+                type: "post",
+                dataType: "json",
+                success: function (data) {
+                    var da = eval(data);
+                    $.each(da, function (i, item) {
+                        if (i === 0)
+                            get_lower_level(item.nav_id);
+                        html += ' <li><a href="javascript:void(0)" onclick="get_lower_level(' + item.nav_id + ')"><span class="glyphicon ' + getIcon(i) + '"></span> ' + item.title + '</a></li>';
+                    });
+                    $('.nav-events').html(html);
+                }
+            });
+        }
+        /*
+        获取导航icon
+        */
+        var getIcon = function (i) {
+            switch (i) {
+                case 0:
+                    return "glyphicon-tasks"; //大赛
+                case 4:
+                    return "glyphicon-align-justify"; //表单设置
+                case 6:
+                    return "glyphicon-user"; //用户
+                case 3:
+                    return "glyphicon-blackboard"; //图书馆
+                case 1:
+                    return "glyphicon-inbox"; //题库系统
+                case 5:
+                    return "glyphicon-time"; //奖品系统
+                case 2:
+                    return "glyphicon-cog"; //系统设置
+                
+                default:
+            };
+            return "";
+        }
+
+        var html = "";
+        //获取下级导航
+        var get_lower_level = function (navId) {
+            $.ajax({
+                url: "GetLowerLevel?navId=" + navId,
+                dataType: "json",
+                type: "post",
+                success: function (data) {
+                    getTree(data);
+                }
+            });
+
+        }
+
+        function getTree(data) {
+            html = '';
+            $.each(data, function (index, item) {
+                if (index === 0) {
+                    html += '<li  aria-expanded="false" class="k-state-active k-item k-first k-state-highlight" role="menuitem">';
+                } else {
+                    html += '<li role="menuitem" aria-expanded="false" class="k-item k-state-default">';
+                }
+                if (item.items) {
+                    html += '<span class="k-link">' + item.text + '<span class="k-icon k-i-arrow-s k-panelbar-expand"></span></span>';
+                    childHandler(item, item.items);
+                } else {
+                    html += '<span class="k-link"><a  href="' + item.link_url + '" target="iframe1" class="k-link">' + item.text + '</a></span>';
+                }
+
+                html += '</li>';
+            });
+
+             $("#panelbar").html(html);
+        }
+
+        function childHandler(item, data) {
+            html += '<ul class="k-group k-panel" role="group" aria-hidden="true" style="display: none;">';
+
+            $.each(data, function (index, item) {
+                if (index === 0) {
+                    html += '<li  aria-expanded="false" class="k-state-active k-item k-first k-state-highlight" role="menuitem">';
+                } else {
+                    html += '<li role="menuitem" aria-expanded="false" class="k-item k-state-default">';
+                }
+                if (item.items) {
+                    html += '<span class="k-link">' + item.text + '<span class="k-icon k-i-arrow-s k-panelbar-expand"></span></span>';
+                    childHandler(item, item.items);
+                } else {
+                    html += '<span class="k-link"><a  href="' + item.link_url + '" target="iframe1" class="k-link">' + item.text + '</a></span>';
+                }
+                html += '</li>';
+            });
+
+            html += "</ul>";
+        }
+
+
+    </script>
+
+    <style>
+        a {
+            display: block
+        }
+
+    </style>
+</head>
+<body>
+    @*<div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <input type="hidden" value="1" name="cookie" id="cookie" />
+                <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a href="/Home/Index" class="navbar-brand hidden-sm">CO线上竞赛平台</a>
+            </div>
+            <div class="navbar-collapse collapse" role="navigation">
+                <ul class="nav navbar-nav nav-events">
+                </ul>
+            </div>
+        </div>
+    </div>*@
+    <div class="container-fluid no-padding container-main" id="container">
+        <div class="row no-margin full-height">
+            <div class="col-xs-12 col-md-2 no-padding">
+                <div class="side-bar">
+                    <ul id="panelbar" class="no-broder"></ul>
+                </div>
+            </div>
+            <div class="col-xs-12 col-md-10  no-padding container-iframe">
+                <iframe class="iframe1" id="iframe1" name="iframe1" src="/home/center" frameborder="0"></iframe>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

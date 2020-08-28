@@ -1,0 +1,315 @@
+﻿@using System.Configuration
+@model ChuanYuan.Model.compet
+@{
+    ViewBag.Title = "Recycle";
+    Layout = "~/Views/Shared/_ManagementLayout.cshtml";
+}
+<script src="~/Scripts/layer/layer.js"></script>
+<link href="~/Scripts/layer/skin/default/layer.css" rel="stylesheet" />
+
+<style>
+    .imgcode {
+        position: relative;
+        left: 150px;
+        top: 50px;
+    }
+</style>
+<ol class="breadcrumb">
+    <li><a href="/Home/Index" target="_top">首页</a></li>
+    <li><a href="List">知识大赛</a></li>
+    <li class="active">回收站</li>
+</ol>
+<div class="container-fluid">
+    <div class="page-header page-header-mini">
+        <h4>回收站 <small>The competition list</small></h4>
+        @*<div class="btn-group btn-group-sm" role="group">
+            <a href="javascipt:void(0)" onclick="DoSelectAll(this)" role="button" checked class="btn btn-default"><span class="glyphicon glyphicon-check"></span> 全选</a>
+            <a href="javascipt:void(0)" onclick="DoDelete()" role="button" class="btn btn-default"><span class="glyphicon glyphicon-trash"></span> 删除</a>
+            <a href="javascipt:void(0)" onclick="DoRecover()" role="button" class="btn btn-default"><span class="glyphicon-align-center"></span> 还原</a>
+        </div>*@
+    </div>
+    <script type="text/javascript">
+        var grid;
+
+        $(document).ready(function () {
+            BindToolBar();
+            $("input").placeholder();
+            kendo.culture("zh-CN");
+            BindGrid();
+        });
+
+        function Recover(e) {
+            if (confirm("您确定要还原该大赛吗？")) {
+                $.get("Cancle?id=" + e+"&state=1",
+                    function (data) {
+                        if (data === "1") {
+                            alert('还原大赛成功!');
+                            window.location.reload();
+                        }
+                    });
+            } else {
+                alert('执行取消操作');
+            }
+        }
+        /**
+* 执行删除
+**/
+        function Delete(e) {
+            if (confirm("您确定要删除该大赛吗？")) {
+                $.get("Delete?id=" + e,
+                    function (data) {
+                        if (data === "1") {
+                            alert('删除大赛成功!');
+                            window.location.reload();
+                        }
+                    });
+            } else {
+                alert('执行取消操作');
+            }
+        }
+        //var DoDelete = function () {
+        //    var ids = "";
+        //    var obj = document.getElementsByName("compet_id");
+        //    for (var o in obj) {
+        //        if (obj.hasOwnProperty(o)) {
+        //            if (obj[o].checked) {
+        //                ids += obj[o].value + ',';
+        //            }
+        //        }
+        //    }
+        //    if (ids === "") {
+        //        alert("请选择数据后执行本次操作!");
+        //        return;
+        //    }
+        //    var ismsg = confirm("您确定要执行删除操作？");
+        //    if (ismsg) {
+        //        $.ajax({
+        //            url: "Delete?ids=" + ids.trim(','),
+        //            type: "get",
+        //            success: function (data) {
+        //                if (data === "1") {
+        //                    alert("删除数据成功!");
+        //                    BindGrid();
+        //                } else {
+        //                    alert("删除数据失败!请联系管理员!");
+        //                }
+        //            }
+        //        });
+        //    }
+        //}
+        /**
+          * 执行全选
+          **/
+        var DoSelectAll = function (e) {
+            if ($(e).attr('checked')) {
+                $(".checkbox").each(function () {
+                    $(this).prop("checked", true); //此处设置每行的checkbox选中，必须用prop方法
+                });
+                $(e).html('<span class="glyphicon glyphicon-check"></span> 取消').removeAttr('checked');
+            } else {
+                $(".checkbox").each(function () {
+                    $(this).prop("checked", false); //此处设置每行的checkbox不选中，必须用prop方法
+                });
+                $(e).html('<span class="glyphicon glyphicon-check"></span> 全选').attr('checked', 'checked');
+            }
+        }
+
+        var BindGrid = function () {
+            grid = $("#grid").kendoGrid({
+                dataSource: {
+                    type: "json",
+                    transport: {
+                        read: "GetRecycleCompetList"
+                    },
+                    schema: {
+                        model: {
+                            fields: {
+                                compet_id: { type: "number" },
+                                title: { type: "string" },
+                                state: { type: "number" },
+                                age_limit: { type: "string" },
+                                gender_limit: { type: "string" },
+                                region_limit: { type: "number" },
+                                max_persons: { type: "number" },
+                                begin_time: { type: "date" },
+                                end_time: { type: "date" }
+                            }
+                        }
+                    },
+                    pageSize: 10
+                },
+                groupable: false,
+                sortable: true,
+                pageable: {
+                    refresh: true,
+                    pageSizes: true,
+                    buttonCount: 5
+                },
+                columns: [{
+                    template: '<input type="checkbox" class="checkbox" value="#=compet_id#" name="compet_id">',
+                    title: '',
+                    width: 30
+                    },
+                    {
+                        field: "compet_id",
+                        title: "编号",
+                        width: 100
+                    },
+                    {
+                        template: '#if(sub_title.length==0) {# #=title# #}else{ # #=title#-#=sub_title# # }#',
+                        title: "大赛",
+                        width: 160
+                    }, {
+
+                        field: "state",
+                        title: "状态",
+                        width: 90,
+                        values: [
+                            { text: "正常", value: 1 },
+                            { text: "冻结", value: 0 }
+                        ]
+                    }, {
+                        field: "gender_limit",
+                        title: "性别要求",
+                        width: 90
+                    }, {
+                        field: "region_limit",
+                        title: "规模",
+                        width: 90,
+                        values: [
+                            { text: "全国", value: "1" },
+                            { text: "全省", value: "2" },
+                            { text: "全市", value: "3" },
+                            { text: "县区", value: "4" },
+                            { text: "内部", value: "5" }
+                        ]
+                    }, {
+                        title: "最大人数",
+                        template: '#if(max_persons==0) {# 不限 #}else{ # #=max_persons# 人 # }#',
+                        width: 90
+                    }, {
+                        field: "group_name",
+                        title: "大赛所属",
+                        width: 100
+                    }, {
+                        field: "begin_time",
+                        format: '{0:yyyy-MM-dd}',
+                        title: "比赛时间",
+                        width: 100
+                    }, {
+                        field: "end_time",
+                        format: '{0:yyyy-MM-dd}',
+                        title: "结束时间",
+                        width: 100
+                    }, {
+                        title: "操作",
+                        template:
+                                "<a class=\"k-button k-button-icontext\" onclick=\"Recover('#=compet_id#')\"><span class=\" \"></span>还原</a><a class=\"k-button k-button-icontext\" onclick=\"Delete('#=compet_id#')\"><span class=\" \"></span>删除</a>",
+                        width: 280
+                    }
+                ]
+            });
+        }
+
+        var BindToolBar = function () {
+            $("#toolbar")
+                .kendoToolBar({
+                    items: [
+                        {
+                            template: "<input id='ddlState' placeholder='大赛状态' />",
+                            overflow: "never"
+                        }, {
+                            template: "<input id='ddlRegion' placeholder='大赛规模' />",
+                            overflow: "never"
+                        }, {
+                            template: "<input id='txtBegintime' name='txtBegintime' placeholder='开赛时间'>",
+                            overflow: "never"
+                        }, {
+                            template: "<input id='txtEndtime' name='txtEndtime' placeholder='结束时间'>",
+                            overflow: "never"
+                        }, {
+                            template: "<input id='txtTitle' name='txtTitle' placeholder='请输入大赛名称' />",
+                            overflow: "never"
+                        }, {
+                            type: "button",
+                            text: "搜索",
+                            click: function () {
+                                var orfilter = { logic: "and", filters: [] };
+                                var ddlState = $("#ddlState").val(); //大赛状态
+                                var txtTitle = $('#txtTitle').val(); //大赛名称
+                                var ddlRegion = $('#ddlRegion').val(); //规模
+                                var txtBegintime = $('#txtBegintime').val(); //开始
+                                var txtEndtime = $('#txtEndtime').val(); //结束
+
+                                if (ddlState) {
+                                    orfilter.filters.push({ field: "state", operator: "eq", value: parseInt(ddlState) });
+                                }
+                                if (txtTitle) {
+                                    orfilter.filters.push({ field: "title", operator: "contains", value: txtTitle });
+                                }
+                                if (ddlRegion) {
+                                    orfilter.filters.push({
+                                        field: "region_limit",
+                                        operator: "eq",
+                                        value: parseInt(ddlRegion)
+                                    });
+                                }
+                                if (txtBegintime) {
+                                    orfilter.filters.push({
+                                        field: "begin_time",
+                                        operator: "gte",
+                                        value: Date
+                                            .parse(txtBegintime)
+                                    });
+                                }
+                                if (txtEndtime) {
+                                    orfilter.filters.push({
+                                        field: "end_time",
+                                        operator: "lte",
+                                        value: Date.parse(txtEndtime)
+                                    });
+                                }
+
+                                if (orfilter.filters.length > 0) {
+                                    grid.data("kendoGrid").dataSource.filter(orfilter);
+                                } else {
+                                    grid.data("kendoGrid").dataSource.filter({});
+                                }
+                            }
+                        }
+                    ]
+                });
+            $("#ddlState").kendoDropDownList({
+                optionLabel: "状态选择",
+                dataTextField: "text",
+                dataValueField: "value",
+                dataSource: [
+                    { text: "正常", value: "1" },
+                    { text: "冻结", value: "0" }
+                ]
+            });
+            $("#ddlRegion")
+                .kendoDropDownList({
+                    optionLabel: "规模选择",
+                    dataTextField: "text",
+                    dataValueField: "value",
+                    dataSource: {
+                        transport: {
+                            read: {
+                                dataType: "json",
+                                url: "RegionType"
+                            }
+                        }
+                    }
+                });
+
+            $("#txtBegintime").kendoDatePicker({ format: 'yyyy-MM-dd HH:mm:ss' });
+            $("#txtEndtime").kendoDatePicker({ format: 'yyyy-MM-dd HH:mm:ss' });
+            $('#txtTitle').kendoMaskedTextBox();
+        }
+    </script>
+    <div class="table-responsive">
+        <div id="toolbar" class="toolbar"></div>
+        <div id="grid"></div>
+    </div>
+</div>

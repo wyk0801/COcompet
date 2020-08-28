@@ -1,0 +1,700 @@
+﻿@using ChuanYuan.Common
+@using ChuanYuan.Model
+@using ChuanYuan.Web.Controllers.Admin.Content
+@{
+    ViewBag.Title = "Add";
+    //Layout = "";
+    Layout = "~/Views/Shared/_ManagementLayout.cshtml";
+}
+@model compet
+<ol class="breadcrumb">
+    <li><a href="/Home/Index" target="_top">首页</a></li>
+    <li><a href="List">知识大赛</a></li>
+    <li class="active">大赛编辑</li>
+</ol>
+<div class="container-fluid">
+    <div class="page-header page-header-mini">
+        @ViewBag.PageName
+    </div>
+    <!-- Nav tabs -->
+    <ul class="nav nav-tabs" role="tablist" id="myTabs">
+        <li role="presentation" class="active"><a href="#basic" aria-controls="basic" role="tab" data-toggle="tab">大赛信息</a></li>
+        <li role="presentation"><a href="#configure" onclick="tabs(this);" aria-controls="configure" role="tab" data-toggle="tab">大赛配置</a></li>
+        <li role="presentation"><a href="#profile" aria-controls="profile" role="tab" data-toggle="tab">详细内容</a></li>
+    </ul>
+    <form class="form-horizontal" action="Add?id=@Model.compet_id" method="post" enctype="multipart/form-data" onsubmit="return check()">
+        <!-- Tab panes -->
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane fade in active" id="basic">
+                <br>
+                <div class="form-group">
+                    <label for="txt_belong" class="col-sm-2 control-label";>大赛所属</label>
+                    <div class="col-sm-4">
+                        @if (ViewBag.Admin == "1")
+                        {
+                            @Html.TextBoxFor(m => m.group_id, new { @id = "txt_belong", @placeholder = "大赛所属", @class = "form-control" })
+                        }
+                        else
+                        {
+                            @Html.TextBoxFor(m => m.group_id, new { @id = "txt_belong", @placeholder = "大赛所属", @class = "form-control", @readonly = "readonly" })
+                        }
+                    </div>
+                    <p id="MegagameBelong"></p>
+                </div>
+                <div class="form-group">
+                    <label for="txt_title" class="col-sm-2 control-label">大赛标题</label>
+                    <div class="col-sm-4">
+                        @Html.TextBoxFor(m => m.title, new { @id = "txt_title", @placeholder = "主标题", @class = "form-control" })
+                    </div>
+                    <p id="MegagameTitle"></p>
+                </div>
+                <div class="form-group">
+                    <label for="txt_subhead" class="col-sm-2 control-label">大赛副标题</label>
+                    <div class="col-sm-4">
+                        @Html.TextBoxFor(m => m.sub_title, new { @name = "txt_subhead", @id = "txt_subhead", @placeholder = "大赛副标题", @class = "form-control" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="txt_number" class="col-sm-2 control-label">大赛编号</label>
+                    <div class="col-sm-4">
+                        @Html.TextBoxFor(m => m.number, new { @id = "txt_number", @placeholder = "大赛编号", @readonly = "readonly", @class = "form-control" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="select_stage" class="col-sm-2 control-label">大赛阶段</label>
+                    <div class="col-sm-4">
+                        <select id="select_stage" name="select_stage" multiple="multiple" data-placeholder=""></select>
+                    </div>
+                    <p id="MegagameStage"></p>
+                </div>
+                <div class="form-group">
+                    <label for="txt_begintime" class="col-sm-2 control-label">比赛时间</label>
+                    <div class="col-sm-4">
+                        @Html.TextBoxFor(m => m.begin_time, new { @id = "txt_begintime", @name = "txt_begintime", @placeholder = "开赛时间" })
+                    </div>
+                    <p id="MegagameBeginTime"></p>
+                </div>
+                <div class="form-group">
+                    <label for="txt_endtime" class="col-sm-2 control-label"></label>
+                    <div class="col-sm-4">
+                        @Html.TextBoxFor(m => m.end_time, new { @id = "txt_endtime", @name = "txt_endtime", @placeholder = "结束时间" })
+                    </div>
+                    <p id="MegagameEndTime"></p>
+                </div>
+                <div class="form-group">
+                    <label for="radio_region_1" class="col-sm-2 control-label">大赛规模</label>
+                    <div class="col-sm-5">
+                        <div class="btn-group" data-toggle="buttons">
+                            <label class="btn btn-primary">
+                                @Html.RadioButtonFor(m => m.region_limit, 1, new { @id = "radio_region_1", @name = "regions", @checked = true })全国
+                            </label>
+                            <label class="btn btn-primary">
+                                @Html.RadioButtonFor(m => m.region_limit, 2, new { @id = "radio_region_2", @name = "regions" })全省
+                            </label>
+                            <label class="btn btn-primary">
+                                @Html.RadioButtonFor(m => m.region_limit, 3, new { @id = "radio_region_3", @name = "regions" })全市
+                            </label>
+                            <label class="btn btn-primary">
+                                @Html.RadioButtonFor(m => m.region_limit, 4, new { @id = "radio_region_4", @name = "regions" })全县、区
+                            </label>
+                            <label class="btn btn-primary">
+                                @Html.RadioButtonFor(m => m.region_limit, 5, new { @id = "radio_region_5", @name = "regions" })内部
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group" style="display: none">
+                    <label for="txt_age" class="col-sm-2 control-label">年龄限制</label>
+                    <div class="col-sm-4">
+                        @Html.TextBoxFor(m => m.age_limit, new { @id = "txt_age", @name = "txt_age", @placeholder = "年龄限制", @class = "form-control" })
+                    </div>
+                </div>
+                <div class="form-group" style="display:none">
+                    <label for="radio_gender_0" class="col-sm-2 control-label">性别要求</label>
+                    <div class="col-sm-4">
+                        <div class=" btn-group" data-toggle="buttons">
+                            <label class="btn btn-primary">
+                                @Html.RadioButtonFor(m => m.gender_limit, "不限", new { @id = "radio_gender_0", @name = "gender", @checked = true })不限
+                            </label>
+                            <label class="btn btn-primary">
+                                @Html.RadioButtonFor(m => m.gender_limit, "男", new { @id = "radio_gender_1", @name = "gender" })男
+                            </label>
+                            <label class="btn btn-primary">
+                                @Html.RadioButtonFor(m => m.gender_limit, "女", new { @id = "radio_gender_2", @name = "gender" })女
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="txt_max_person" class="col-sm-2 control-label">最大人数</label>
+                    <div class="col-sm-4">
+                        @Html.TextBoxFor(m => m.max_persons, new { @type = "number", @id = "txt_max_person", @name = "txt_max_person", @placeholder = "最大参赛人数" })
+                    </div>
+                    <p id="MegagameNumber"></p>
+                </div>
+                <div class="form-group hidden">
+                    <label for="radio_is_forged_0" class="col-sm-2 control-label">开启机器人</label>
+                    <div class="col-sm-4">
+                        <div class=" btn-group" data-toggle="buttons">
+                            <label class="btn btn-primary">
+                                @Html.RadioButtonFor(m => m.is_forged, "0", new { @id = "radio_is_forged_0", @name = "is_forged", @checked = true })否
+                            </label>
+                            <label class="btn btn-primary">
+                                @Html.RadioButtonFor(m => m.is_forged, "1", new { @id = "radio_is_forged_1", @name = "is_forged" })是
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="file_cover" class="col-sm-2 control-label">活动图片</label>
+                    <div class="col-sm-4">
+                        <div class="input-group">
+                            <input type="file" class="form-control" id="file_cover" name="cover" placeholder="请上传活动图片">
+                            <span class="input-group-btn">
+                            </span>
+                        </div>
+                        <span style="color:red">@Model.cover</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="txt_is_rank" class="col-sm-2 control-label">实时排行</label>
+                    <div class="col-sm-4">
+                        @*@Html.TextBoxFor(m => m.is_rank, new { @type = "number", @id = "txt_is_rank", @name = "txt_is_rank", @placeholder = "实时排行人数" })*@
+
+                        <div class=" btn-group" data-toggle="buttons">
+                            <label class="btn btn-primary">
+                                @Html.RadioButtonFor(m => m.is_rank, "0", new { @id = "radio_is_rank_0", @name = "is_rank", @checked = true })否
+                            </label>
+                            <label class="btn btn-primary">
+                                @Html.RadioButtonFor(m => m.is_rank, "1", new { @id = "radio_is_rank_1", @name = "is_rank" })是
+                            </label>
+                        </div>
+
+                    </div>
+                    <p id="MegagameRank"></p>
+                </div>
+
+
+                <div class="form-group">
+                    <label for="txt_is_qbank" class="col-sm-2 control-label">题库</label>
+                    <div class="col-sm-4">
+                        <div class=" btn-group" data-toggle="buttons">
+                            <label class="btn btn-primary">
+                                @Html.RadioButtonFor(m => m.is_qbank, "1", new { @id = "radio_is_qbank_1", @name = "is_qbank", @checked = true })显示
+                            </label>
+                            <label class="btn btn-primary">
+                                @Html.RadioButtonFor(m => m.is_qbank, "0", new { @id = "radio_is_qbank_0", @name = "is_qbank" })不显示
+                            </label>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+
+
+            <div role="tabpanel" class="tab-pane  fade in" id="configure">
+                <br>
+                @foreach (compet_details item in ViewBag.cdlist)
+                {
+                    <div class="panel panel-default">
+                        <div class="panel-heading">@StageController.GetStageModel(item.exam_type)配置</div>
+                        <div class="panel-body" id="@item.exam_type" style="display: none">
+
+                            <div class="form-group">
+                                <label for="txt_question_amount_@item.exam_type" class="col-sm-2 control-label">题目数量</label>
+                                <div class="col-sm-4">
+                                    @Html.TextBoxFor(m => item.question_amount, new { id = "txt_question_amount_" + @item.exam_type, name = "txt_question_amount_" + @item.exam_type, placeholder = "题目数量" })
+                                </div>
+                                <p id="question_amount_@item.exam_type"></p>
+                            </div>
+                            <div class="form-group">
+                                <label for="txt_begintime_@item.exam_type" class="col-sm-2 control-label">开赛时间</label>
+                                <div class="col-sm-4">
+                                    @Html.TextBoxFor(m => item.begin_time, new { id = "txt_begintime_" + @item.exam_type, name = "txt_begintime_" + @item.exam_type, placeholder = "开赛时间", @class = "form-control" })
+                                </div>
+                                <p id="begintime_@item.exam_type"></p>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-offset-2 col-sm-4">
+                                    @Html.TextBoxFor(m => item.end_time, new { @class = "form-control", id = "txt_endtime_" + @item.exam_type, name = "txt_endtime_" + @item.exam_type, placeholder = "结束时间" })
+                                </div>
+                                <p id="endtime_@item.exam_type"></p>
+                            </div>
+                            <div class="form-group">
+                                <label for="select_unit_@item.exam_type" class="col-sm-2 control-label">选拔规则</label>
+                                <div class="col-sm-4">
+                                    @Html.DropDownListFor(m => item.unit, ViewBag.selist as IEnumerable<SelectListItem>, new { id = "select_unit_" + @item.exam_type, name = "select_unit_" + @item.exam_type })
+                                    <input type="hidden" id="hid_@item.exam_type" value="@item.unit" />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-offset-2 col-sm-4">
+                                    @Html.TextBoxFor(m => item.quantity, new { id = "txt_quantity_" + @item.exam_type, name = "txt_quantity_" + @item.exam_type, placeholder = "录取分数" })
+                                </div>
+                                <p id="quantity_@item.exam_type"></p>
+                            </div>
+                            <div class="form-group">
+                                <label for="txt_test_time_@item.exam_type" class="col-sm-2 control-label">考试时间</label>
+                                <div class="col-sm-4">
+                                    @Html.TextBoxFor(m => item.test_time, new { id = "txt_test_time_" + @item.exam_type, name = "txt_test_time_" + @item.exam_type, placeholder = "考试时间" })
+                                </div>
+                                <p id="test_time_@item.exam_type"></p>
+                            </div>
+                            <div class="form-group">
+                                <label for="txt_join_time_@item.exam_type" class="col-sm-2 control-label">参与次数</label>
+                                <div class="col-sm-4">
+                                    @Html.TextBoxFor(m => item.join_time, new { id = "txt_join_time_" + @item.exam_type, name = "txt_join_time_" + @item.exam_type, placeholder = "参与次数" })
+                                </div>
+                                <p id="join_time_@item.exam_type"></p>
+                            </div>
+                            <div class="form-group">
+                                <label for="txt_tags_@item.exam_type" class="col-sm-2 control-label">考题标签</label>
+                                <div class="col-sm-4">
+                                    @Html.TextBoxFor(m => item.tags, new { id = "txt_tags_" + @item.exam_type, name = "txt_tags_" + @item.exam_type, @class = "form-control", placeholder = "多个标签以-隔开" })
+                                </div>
+                                <p id="txt_tags_@item.exam_type"></p>
+                            </div>
+
+                            <div class="form-group" name="rankNum">
+                                <label for="txt_rank_num_@item.exam_type" class="col-sm-2 control-label">排行显示人数</label>
+                                <div class="col-sm-4">
+                                    @Html.TextBoxFor(m => item.rank_num, new { id = "txt_rank_num_" + @item.exam_type, name = "txt_rank_num_" + @item.exam_type, placeholder = "排行显示人数" })
+                                </div>
+                                <p id="join_time_@item.exam_type"></p>
+                            </div>
+
+                        </div>
+                    </div>
+                }
+            </div>
+
+
+
+
+
+            <div role="tabpanel" class="tab-pane  fade in" id="profile">
+                <br>
+                <div class="form-group">
+                    <label for="editor" class="col-sm-2 control-label">详细内容</label>
+                    <div class="col-sm-6">
+                        @Html.TextAreaFor(m => m.contents, new { @id = "editor", @name = "editor", @row = "20", @col = "40" })
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="fixed-bottom container-submit">
+            <div class="btn-group">
+                <button type="submit" class="btn btn-primary">提交保存</button>
+                @*<button type="button" onclick="javascript: history.back(-1);" class="btn btn-warning">返回</button>*@
+                <button type="button" onclick="goback();" class="btn btn-warning">返回</button>
+            </div>
+        </div>
+        <script type="text/javascript">
+            var str;
+            var b = true;
+
+            function tabs(data) {
+                var exam = $("#select_stage").val();
+                var types = $(".panel-body");
+                for (var j = 0; j < types.length; j++) {
+                    var typeid = types[j].id;
+                    if (exam.indexOf(typeid) >= 0) {
+                        $("#" + typeid).css("display", "block");
+                    } else {
+                        $("#" + typeid).css("display", "none");
+                        $("#quantity_" + typeid).val('');
+                    }
+                }
+
+                if ($("#radio_is_rank_1").parent("label").hasClass("active")) {
+                    $("div[name=rankNum]").show();
+                } else
+                    $("[name=rankNum]").hide();
+
+                for (var i = 0; i < types.length; i++) {
+                    var type_id = types[i].id;
+                    $("#txt_question_amount_" + type_id)
+                        .kendoNumericTextBox({ format: "# 题", step: 5, min: 1, max: 200 });
+                    $("#txt_begintime_" + type_id).kendoDatePicker({ format: 'yyyy-MM-dd HH:mm:ss' });
+                    $("#txt_endtime_" + type_id).kendoDatePicker({ format: 'yyyy-MM-dd HH:mm:ss' });
+                    $("#select_unit_" + type_id)
+                        .kendoDropDownList({
+                            change: function() {
+                                changeValue(type_id);
+                            }
+                        });
+                    $("#txt_quantity_" + type_id).kendoNumericTextBox({ format: "#", step: 5, min: 0 });
+                    $("#txt_test_time_" + type_id).kendoNumericTextBox({ format: "# 分钟", step: 5, min: 0 });
+                    $("#txt_join_time_" + type_id).kendoNumericTextBox({ format: "# 次", step: 1, min: 0 });
+                    $("#currency").kendoNumericTextBox({ format: "# 分钟", step: 5, min: 0 });
+                    $("#txt_rank_num_" + type_id).kendoNumericTextBox({ format: "# 人", step: 1, min: 0 });
+                }
+            }
+
+            function delValue(e) {
+                var id = $("#" + e + ">.form-group").eq(5).find("input").eq(1).attr("id");
+                $("#" + id).data("kendoNumericTextBox").value("");
+            }
+
+            function changeValue(e) {
+                $("#txt_quantity_" + e).data("kendoNumericTextBox").value(0);
+                if ($("#select_unit_" + e)[0].value == "Rate") {
+                    $("#txt_quantity_" + e).data("kendoNumericTextBox").max(100); //设置最大值
+                } else {
+                    $("#txt_quantity_" + e).data("kendoNumericTextBox").max(10000); //设置最大值
+                }
+            }
+
+            function goback() {
+                $.post("/WisdomCompet/Back",function(data) {
+                    if (data)
+                        window.history.back(-1);
+                });
+            }
+
+            $(document)
+                .ready(function() {
+                    kendo.culture("zh-CN");
+
+
+                    $("#txt_begintime").kendoDatePicker({ format: 'yyyy-MM-dd HH:mm:ss' }); //,value: new Date()
+                    $("#txt_endtime").kendoDatePicker({ format: 'yyyy-MM-dd HH:mm:ss' });
+                    $("#txt_age").kendoMaskedTextBox({ mask: "00-00" });
+                    $("#txt_max_person").kendoNumericTextBox({ format: "# 人", step: 5, min: 0 });
+
+                    //var type=$(".panel-body");
+                    //for (var i = 0; i < type.length; i++) {
+                    //    var type_id = type[i].id;
+                    //    $("#txt_question_amount_"+type_id).kendoNumericTextBox({ format: "# 题", step: 5, min: 1,max:200 });
+                    //    $("#txt_begintime_"+type_id).kendoDatePicker({ format: 'yyyy-MM-dd HH:mm:ss' });
+                    //    $("#txt_endtime_"+type_id).kendoDatePicker({ format: 'yyyy-MM-dd HH:mm:ss' });
+                    //    $("#select_unit_"+type_id).kendoDropDownList({
+                    //        change: function() {
+                    //            changeValue(type_id);
+                    //        }
+                    //    });
+                    //    $("#txt_quantity_"+type_id).kendoNumericTextBox({ format: "#", step: 5, min: 0 });
+                    //    $("#txt_test_time_"+type_id).kendoNumericTextBox({ format: "# 分钟", step: 5, min: 0 });
+                    //    $("#txt_join_time_"+type_id).kendoNumericTextBox({ format: "# 次", step: 1, min: 0});
+                    //    $("#currency").kendoNumericTextBox({ format: "# 分钟", step: 5, min: 0 });
+                    //    $("#txt_rank_num_"+type_id).kendoNumericTextBox({ format: "# 人", step: 1, min: 0 });
+                    //}
+                    //大赛主题限制,生成拼音简写
+                    $("#txt_subhead")
+                        .blur(function() {
+                            var txttitle = $("#txt_title").val();
+                            var txtsubhead = $("#txt_subhead").val();
+                            $.post("GetLetter",
+                                { word: txttitle, word1: txtsubhead },
+                                function(data) {
+                                    $("#txt_number").val(data);
+                                });
+                        });
+                    $("#txt_title")
+                        .blur(function() {
+                            var txttitle = $("#txt_title").val();
+                            var txtsubhead = $("#txt_subhead").val();
+                            $.post("GetLetter",
+                                { word: txttitle, word1: txtsubhead },
+                                function(data) {
+                                    $("#txt_number").val(data);
+                                });
+                        });
+
+                    $("#editor").kendoEditor();
+                    //Radio Buttons Groups Active State;
+                    $('input[type="radio"]:checked').parent('label').addClass('active');
+
+                    if ($("#radio_is_rank_1").parent("label").hasClass("active")) {
+                        $("div[name=rankNum]").show();
+                    } else
+                        $("[name=rankNum]").hide();
+                    //获取图书馆组
+                    $('#txt_belong')
+                        .kendoComboBox({
+                            filter: "contains",
+                            dataTextField: "text",
+                            dataValueField: "value",
+                            index: 0,
+                            dataSource: {
+                                transport: {
+                                    read: {
+                                        dataType: "json",
+                                        url: "/WisdomCompet/GetLibrary"
+                                    }
+                                }
+                            }
+                        });
+                    //输入不对，清空数据
+                    $('#txt_belong')
+                        .blur(function() {
+                            var userGroupName = $("#txt_belong").val();
+                            $.post("/WisdomCompet/GetUserGroup",
+                                "userGroupName=" + userGroupName,
+                                function(data) {
+                                    if (data == "0") {
+                                        var color = $("#txt_belong").data("kendoComboBox").text();
+                                        color = "";
+                                        $("#txt_belong").data("kendoComboBox").text(color);
+
+                                    } else {
+                                        return true;
+                                    }
+                                });
+                        });
+                    //大赛阶段
+                    $('#select_stage')
+                        .kendoMultiSelect({
+                            dataTextField: "text",
+                            dataValueField: "value",
+                            value: @Html.Raw(ViewData["arr"].ToString()),
+            dataSource: {
+                transport: {
+                    read: {
+                        dataType: "json",
+                        url: "ExamType?ssOrganization="+$("#txt_belong").val()
+                    }
+                }
+            }
+        }).data("kendoMultiSelect");
+        //删除大赛阶段
+        $("#select_stage").change(function(){
+            tabs("");
+        });
+        $("#txt_belong").change(function() {
+            //$("#select_stage").empty();
+            //var t = $('#select_stage').kendoMultiSelect;
+            var dataSource = new kendo.data.DataSource({
+                transport: {
+                    read: {
+                        url: "ExamType?ssOrganization="+$("#txt_belong").val(),
+                        dataType: "json"
+                    }
+                }
+            });
+            var multiselect = $("#select_stage").data("kendoMultiSelect");
+            multiselect.setDataSource(dataSource);//给控件赋值
+            var userGroupName = $("#txt_belong").val();
+            //$("#configure").remove();
+            $.post("/WisdomCompet/GetCdlist","userGroupName=" + userGroupName,
+                function(datas) {
+                    $("#configure").load(location.href+" #configure");
+                });
+            //$("#configure").load(location.href+" #configure");
+        });
+    });
+    var MegagameBelong=false;  //大赛所属
+    var MegagameTitle=false;  //大赛标题
+    var MegagameStage=false; //大赛阶段
+    var MegagameBeginTime=false;  //开赛时间
+    var MegagameEndTime=false; //结束时间
+    var MegagameNumber=false;  //最大参数人数
+    var QuestionAmount=false;  //题目数量
+    var MomentBeginTime=false;  //阶段的开始时间
+    var MomentEndTime=false;  //阶段的结束时间
+    //var MarkTime=false;  //阶段的评分时间
+    var TestTime=false;  //阶段的评分时间
+    var QuantityNum=false;
+    //标题不符合条件阻止提交
+    function check() {
+        var txt_belong=$("#txt_belong").val();  //大赛所属txt_belong
+        if(txt_belong=="")
+        {
+            MegagameBelong=false;
+            $("#MegagameBelong").css({ color: "red" });
+            $("#MegagameBelong").html("大赛所属不能为空 ！");
+        }else{
+            MegagameBelong=true;
+            $("#MegagameBelong").html("");
+        }
+        var name = $("#txt_title").val();    //主标题
+        var sub_name = $("#txt_subhead").val();     //副标题
+        if (name.length > 50 || sub_name.length > 50 || name.length <= 0) {
+            MegagameTitle = false;
+            $("#MegagameTitle").css({ color: "red" });
+            $("#MegagameTitle").html("主标题必须在50个字以内(必填)，副标题在50个字以内(可不填) ！");
+        } else {
+            MegagameTitle = true;
+            $("#MegagameTitle").html("");
+        }
+        var txt_begintime=ExChange($("#txt_begintime").val()); //大赛开始时间
+        var txt_endtime=ExChange($("#txt_endtime").val());  //大赛结束时间
+        //大赛开始时间
+
+        if(txt_begintime=="")
+        {
+            MegagameBeginTime=false;
+            $("#MegagameBeginTime").css({ color: "red" });
+            $("#MegagameBeginTime").html("大赛开始时间不能为空！");
+        }else if(txt_begintime=="1"){
+            MegagameBeginTime=false;
+            $("#MegagameBeginTime").css({ color: "red" });
+            $("#MegagameBeginTime").html("请输入正确的日期格式！");
+        }else{
+            MegagameBeginTime=true;
+            $("#MegagameBeginTime").html("");
+        }
+        //大赛结束时间
+        if(txt_endtime=="")
+        {
+            MegagameEndTime=false;
+            $("#MegagameEndTime").css({ color: "red" });
+            $("#MegagameEndTime").html("大赛结束时间不能为空！");
+        }else if(txt_endtime=="1"){
+            MegagameEndTime=false;
+            $("#MegagameEndTime").css({ color: "red" });
+            $("#MegagameEndTime").html("请输入正确的日期格式！");
+        }else{
+            MegagameEndTime=true;
+            $("#MegagameEndTime").html("");
+        }
+        //判断大赛阶段
+        var select_stage=$("#select_stage").val();
+        if(select_stage==null){
+            MegagameStage=false;
+            QuestionAmount=false;  //题目数量
+            MomentBeginTime=false;  //阶段的开始时间
+            MomentEndTime=false;  //阶段的结束时间
+            TestTime=false;  //阶段的评分时间
+            QuantityNum=false;
+            $("#MegagameStage").css({ color: "red" });
+            $("#MegagameStage").html("请选择大赛阶段！");
+        }else{
+            MegagameStage=true;
+            $("#MegagameStage").html("");
+            //大赛阶段判断
+            var exams = $("#select_stage").val();
+            var types=$(".panel-body");
+            for (var j = 0; j < types.length; j++) {
+                var select_stage = types[j].id;
+                if (exams.indexOf(select_stage) >= 0) {
+                    //题目数量
+                    var txt_question_amount=$("#txt_question_amount_"+select_stage).val();
+                    if(txt_question_amount=="")
+                    {
+                        QuestionAmount=false;
+                        $("#question_amount_"+select_stage).css({ color: "red" });
+                        $("#question_amount_"+select_stage).html("题目数量不能为空！");
+                    }else{
+                        QuestionAmount=true;
+                        $("#question_amount_"+select_stage).html("");
+                    }
+                    //阶段开始时间
+                    var begin_time=ExChange($("#txt_begintime_"+select_stage).val());
+                    if(begin_time=="")
+                    {
+                        MomentBeginTime=false;
+                        $("#begintime_"+select_stage).css({ color: "red" });
+                        $("#begintime_"+select_stage).html("开始时间不能为空！");
+                    }else if(begin_time=="1"){
+                        MomentBeginTime=false;
+                        $("#begintime_"+select_stage).css({ color: "red" });
+                        $("#begintime_"+select_stage).html("请输入正确的日期格式！");
+                    }else if(begin_time<txt_begintime)
+                    {
+                        MomentBeginTime=false;
+                        $("#begintime_"+select_stage).css({ color: "red" });
+                        $("#begintime_"+select_stage).html("大赛阶段开始时间不能小于大赛的开始时间！");
+                    }else{
+                        MomentBeginTime=true;
+                        $("#begintime_"+select_stage).html("");
+                    }
+                    //阶段结束时间
+                    var End_time=ExChange($("#txt_endtime_"+select_stage).val());
+                    if(End_time=="")
+                    {
+                        MomentEndTime=false;
+                        $("#endtime_"+select_stage).css({ color: "red" });
+                        $("#endtime_"+select_stage).html("结束时间不能为空！");
+                    }else if(End_time=="1"){
+                        MomentEndTime=false;
+                        $("#endtime_"+select_stage).css({ color: "red" });
+                        $("#endtime_"+select_stage).html("请输入正确的日期格式！");
+                    }else if(End_time<begin_time){
+                        MomentEndTime=false;
+                        $("#endtime_"+select_stage).css({ color: "red" });
+                        $("#endtime_"+select_stage).html("结束时间不能小于开始时间！");
+                    } else if(End_time>txt_endtime){
+                        MomentEndTime=false;
+                        $("#endtime_"+select_stage).css({ color: "red" });
+                        $("#endtime_"+select_stage).html("大赛阶段结束时间不能大于大赛结束时间！");
+                    }else{
+                        MomentEndTime=true;
+                        $("#endtime_"+select_stage).html("");
+                    }
+                    //评分时间
+                    var test_time=$("#txt_test_time_"+select_stage).val();
+                    if(test_time== "")
+                    {
+                        TestTime=false;
+                        $("#test_time_"+select_stage).css({ color: "red" });
+                        $("#test_time_"+select_stage).html("考试时间不能为空！");
+                    }else{
+                        TestTime=true;
+                        $("#test_time_"+select_stage).html("");
+                    }
+                    //阶段数量
+                    var quantity=$("#txt_quantity_"+select_stage).val();
+                    if(quantity=="")
+                    {
+                        QuantityNum=false;
+                        $("#quantity_"+select_stage).css({ color: "red" });
+                        $("#quantity_"+select_stage).html("录取分数不能为空！");
+                    }else{
+                        QuantityNum=true;
+                        $("#quantity_"+select_stage).html("");
+                    }
+                }
+            }
+        }
+
+        //最大人数
+        var txt_age=$("#txt_max_person").val();
+        if(txt_age=="")
+        {
+            MegagameNumber=false;
+            $("#MegagameNumber").css({ color: "red" });
+            $("#MegagameNumber").html("最大人数不能为空！");
+        }else{
+            MegagameNumber=true;
+            $("#MegagameNumber").html("");
+        }
+
+        //条件满足则提交
+        if (MegagameBelong && MegagameTitle && MegagameStage && MegagameBeginTime && MegagameEndTime && MegagameNumber && QuestionAmount && MomentBeginTime && MomentEndTime && TestTime && QuantityNum)  {
+            return true;
+        } else {
+            return false;
+        }
+    }
+</script>
+    </form>
+</div>
+<script type="text/javascript">
+    $(function() {
+        for (var i = 1; i < 6; i++) {
+            BindEditUnit(i + "s");
+        }
+    });
+    function BindEditUnit(e) {
+        var ys = $("#select_unit_"+e).data("kendoDropDownList");
+        if (ys) ys.value($("#hid_"+e).val());
+    }
+    //转换时间
+    function ExChange(time)
+    {
+        var reg = /^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2}) (\d{1,2}):(\d{1,2}):(\d{1,2})$/;
+        var r = time.match(reg);
+        if(time=="")
+        {
+            return "";
+        }else if(!r){
+            return "1";
+        }else{
+            var d1 = new Date(time.replace(/\-/g, "\/"));
+            return Date.parse(d1);
+
+        }
+    }
+</script>

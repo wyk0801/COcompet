@@ -1,0 +1,415 @@
+﻿@{
+    ViewBag.Title = "List";
+    Layout = "~/Views/Shared/_ManagementLayout.cshtml";
+}
+<ol class="breadcrumb">
+    <li><a href="/Home/Index" target="_top">首页</a></li>
+    <li><a href="List">题库系统</a></li>
+    <li class="active">题库列表</li>
+</ol>
+<div class="container-fluid">
+    <div class="page-header page-header-mini">
+        <h4>题库列表 <small>The questions list</small></h4>
+        <div class="btn-group btn-group-sm" role="group">
+            <a href="Add" role="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> 添加</a>
+            @*<a href="Save" role="button" class="btn btn-default"><span class="glyphicon glyphicon-floppy-save"></span> 保存</a>*@
+            <a href="javascript:void(0)" onclick="selectAll(this)" role="button" class="btn btn-default" checked><span class="glyphicon glyphicon-check"></span>全选</a>
+            <a href="javascript:void(0)" onclick="DodelAll()" role="button" class="btn btn-default"><span class="glyphicon glyphicon-trash"></span> 删除</a>
+            <a href="javascript:void(0)" onclick="DoImport()" role="button" class="btn btn-default"><span class="glyphicon glyphicon-import"></span> 导入</a>
+            <a href="javascript:void(0)" onclick="DoAuditAll()" role="button" class="btn btn-default"><span class="glyphicon glyphicon-adjust"></span> 审核</a>
+        </div>
+    </div>
+    <div class="table-responsive">
+        <div id="toolbar" class="toolbar"></div>
+        <div id="grid"></div>
+    </div>
+    <script type="text/javascript">
+        /*
+        * 声明变量
+        **/
+        var grid;
+
+        /*
+         * 页面加载
+         **/
+        $(document).ready(function () {
+            BindToolBar();
+            $("input").placeholder();
+            kendo.culture("zh-CN");
+            BindGrid();
+        });
+        /*
+        * 绑定工具栏
+        **/
+        var BindToolBar = function () {
+            $("#toolbar").kendoToolBar({
+                items: [
+                    {
+                        template: "<input id='category' placeholder='选择类别' />",
+                        overflow: "never"
+                    }, {
+                        template: "<input id='exam_type' placeholder='选择题型' />",
+                        overflow: "never"
+                    }, {
+                        template: "<input id='star_level' placeholder='难度' />",
+                        overflow: "never"
+                    }, {
+                        template: "<input id='txt_audit' placeholder='选择状态' />",
+                        overflow: "never"
+                    }, {
+                        template: "<input id='question' type='text' placeholder='关键字' style='width:220px;'>",
+                        overflow: "never"
+                    }, {
+                        type: "button",
+                        text: "搜索",
+                        click: function () {
+                            $("#grid").data("kendoGrid").dataSource.filter();
+                            var category = $('#category').val(); //类别
+                            var examtype = $('#exam_type').val(); //题型
+                            var starlevel = $('#star_level').val(); //难度
+                            var question = $('#question').val(); //关键字
+                            var txt_audit = $("#txt_audit").val(); //发布状态
+                            var arr = [];
+                            if (category) {
+                                arr.push({
+                                    logic: "or",
+                                    filters: [
+                                        {
+                                            field: "type_id",
+                                            operator: "eq",
+                                            value: parseInt(category)
+                                        }
+                                    ]
+                                });
+                            }
+                            if (examtype) {
+                                arr.push({ field: "type_enum", operator: "contains", value: examtype });
+                            }
+                            if (starlevel) {
+                                arr.push({ field: "star_level", operator: "eq", value: parseInt(starlevel) });
+                            }
+                            if (question) {
+                                arr.push({ field: "question", operator: "contains", value: question });
+                            } if (txt_audit) {
+                                arr.push({ field: "status", operator: "eq", value: parseInt(txt_audit) });
+                            }
+                            $("#grid").data("kendoGrid").dataSource.filter(arr);
+                        }
+                    }
+                ]
+            });
+
+            $("#category").kendoDropDownList({
+                optionLabel: "类别选择",
+                dataTextField: "text",
+                dataValueField: "value",
+                dataSource: {
+                    transport: {
+                        read: {
+                            url: "GetQuestionsList",
+                            dataType: "json"
+                        }
+                    }
+                },
+                index: 0
+            });
+
+            $("#exam_type").kendoDropDownList({
+                optionLabel: "题型选择",
+                dataTextField: "text",
+                dataValueField: "value",
+                dataSource: {
+                    transport: {
+                        read: {
+                            dataType: "json",
+                            url: "ProblemType"
+                        }
+                    }
+                }
+            });
+
+            $("#star_level").kendoDropDownList({
+                optionLabel: "难度选择",
+                dataTextField: "text",
+                dataValueField: "value",
+                dataSource: {
+                    transport: {
+                        read: {
+                            dataType: "json",
+                            url: "ProblemDifficulty"
+                        }
+                    }
+                }
+            });
+            /*审核状态*/
+            $("#txt_audit").kendoDropDownList({
+                optionLabel: "状态选择",
+                dataTextField: "text",
+                dataValueField: "value",
+                dataSource: {
+                    transport: {
+                        read: {
+                            dataType: "json",
+                            url: "AuditStatic"
+                        }
+                    }
+                }
+            });
+            //kendo ui 文本框
+            $('#question').kendoMaskedTextBox();
+        }
+        /*
+        * 绑定Grid
+        **/
+        var BindGrid = function () {
+            grid = $("#grid").kendoGrid({
+                dataSource: {
+                    type: "json",
+                    transport: {
+                        read: "QquestionsData"
+                    },
+                    schema: {
+                        model: {
+                            fields: {
+                                category_id: { type: "string" },
+                                question: { type: "string" },
+                                read_level: { type: "number" },
+                                score: { type: "number" },
+                                issue_time: { type: "date" },
+                                star_level: { type: "number" },
+                                type_id: { type: "number" },
+                                type_enum: { type: "string" },
+                                title: { type: "string" },
+                                //question_category: { type: "string" },
+                                //question_types: { type: "string" },
+                                //question_difficulty: { type: "string" },
+                                //question_static: { type: "string" },
+                                status: { type: "number" }
+                            }
+                        }
+                    },
+                    pageSize: 20,
+                },
+                height: 650,
+                groupable: false,
+                sortable: true,
+                pageable: {
+                    refresh: true,
+                    pageSizes: true,
+                    buttonCount: 5
+                },
+                columns: [
+                    {
+                        template: '<input type="checkbox" class="checkbox" name="cId" value="#=question_id#">',
+                        title: '',
+                        width: 30
+                    }, {
+                        field: "title",
+                        title: '类别',
+                        width: 120
+                    }, {
+                        template: '#if(type_enum=="MultipleChoice") {# 选择题 #}else if(type_enum=="TrueOrFalse"){ #是非题 # }else if(type_enum=="Matching"){#连线题 #}else{#填空题 #}#',
+                        title: "题型",
+                        width: 120
+                    }, {
+                        field: "question",
+                        title: "题干",
+                        width: 240
+                    }, {
+                        template: '#if(star_level==1) {#入门 #}else if(star_level==2){ #简单 # }else if(star_level==3){#正常 #}else if(star_level==4){#困难 #}else{#专业 #}#',
+                        title: '难度',
+                        width: 80
+                    }, {
+                        field: 'score',
+                        title: '分值',
+                        format: '{0:0 分}',
+                        width: 80
+                    }, {
+                        template: '#if(status==6){#已发布#}else{#未发布 #}#',
+                        title: '状态',
+                        width: 80
+                    }, {
+                        field: 'issue_time',
+                        title: '发布时间',
+                        format: '{0:yyyy-MM-dd}',
+                        width: 100
+                    },
+                    {
+                        command: [
+                            {
+                                name: "doEidt",
+                                text: "编辑",
+                                click: function (e) {
+                                    var tr = $(e.target).closest("tr");
+                                    var data = this.dataItem(tr);
+                                    DoEdit(data.question_id);
+                                }
+                            },
+                            {
+                                name: "doDel",
+                                text: "删除",
+                                click: function (e) {
+                                    var tr = $(e.target).closest("tr");
+                                    var data = this.dataItem(tr);
+                                    DoDel(data.question_id, tr);
+                                }
+                            }, {
+                                name: "doAudit",
+                                text: "审核",
+                                click: function (e) {
+                                    var tr = $(e.target).closest("tr");
+                                    var data = this.dataItem(tr);
+                                    DoAudit(data.question_id, tr);
+                                }
+                            }
+                        ],
+                        title: "操作",
+                        width: "250px"
+                    }
+                ]
+            });
+        }
+
+
+        /*
+         * 编辑
+         **/
+        var DoEdit = function (quId) {
+            window.location.href = "Eidts?quId=" + quId;
+        }
+        /*审核*/
+        var DoAudit = function (quId) {
+            window.location.href = "Index?quId=" + quId;
+        }
+        /*
+        * 删除
+        **/
+        var DoDel = function (quId, obj) {
+            var ismsg = confirm("您确定要删除当前数据吗？");
+            if (ismsg) {
+                $.ajax({
+                    url: "Delete?quId=" + quId,
+                    type: "post",
+                    success: function (data) {
+                        if (data === "0") {
+
+                            //删除成功同时删除数据源里面的东西
+                            obj.remove();
+                        } else {
+                            alert("删除数据失败!请联系管理员!");
+                        }
+                    }
+                });
+            }
+        }
+
+        /*
+        * 全选
+        **/
+        var selectAll = function (e) {
+            if ($(e).attr('checked')) {
+                $(".checkbox").each(function () {
+                    $(this).prop("checked", true); //此处设置每行的checkbox选中，必须用prop方法
+                    $(this).closest("tr").addClass("k-state-selected"); //设置grid 每一行选中
+                });
+                $(e).html('<span class="glyphicon glyphicon-check"></span> 取消').removeAttr('checked');
+            } else {
+                $(".checkbox").each(function () {
+                    $(this).prop("checked", false); //此处设置每行的checkbox不选中，必须用prop方法
+                    $(this).closest("tr").removeClass("k-state-selected"); //设置grid 每一行不选中
+                });
+                $(e).html('<span class="glyphicon glyphicon-check"></span> 全选').attr('checked', 'checked');
+            }
+        }
+
+        /*
+        * 全选删除
+        **/
+        var DodelAll = function () {
+            var trall = [];
+            var guids = "";
+            var obj = document.getElementsByName("cId");
+            for (var o in obj) {
+                if (obj.hasOwnProperty(o)) {
+                    if (obj[o].checked) {
+                        guids += obj[o].value + ',';
+                        trall.push($(obj[o]).closest("tr"));
+                    }
+                }
+            }
+
+            if (guids === "") {
+                alert("请选择数据后执行本次操作!");
+                return;
+            }
+
+            var ismsg = confirm("您确定要删除当前选中的数据吗？");
+            if (ismsg) {
+                $.ajax({
+                    url: "DeleteList?guIds=" + guids.trim(','),
+                    type: "post",
+                    success: function (data) {
+                        if (data === "0") {
+                            for (var i in trall) {
+                                if (trall.hasOwnProperty(i)) {
+                                    trall[i].remove();
+                                }
+                            }
+                        } else {
+                            alert("删除数据失败!请联系管理员!");
+                        }
+                    }
+                });
+            }
+        }
+        /**
+        *执行导入
+        **/
+        var DoImport = function () {
+            window.location.href = "/Admin/Content/Import/ImportQuestion?tableName=Questions";
+        }
+
+        /**
+        *全选发布
+        **/
+        var DoAuditAll = function () {
+            var trall = [];
+            var guids = "";
+            var obj = document.getElementsByName("cId");
+            for (var o in obj) {
+                if (obj.hasOwnProperty(o)) {
+                    if (obj[o].checked) {
+                        guids += obj[o].value + ',';
+                        trall.push($(obj[o]).closest("tr"));
+                    }
+                }
+            }
+
+            if (guids === "") {
+                alert("请选择数据后执行本次操作!");
+                return;
+            }
+
+            var ismsg = confirm("您确定要发布当前选中的数据吗？");
+            if (ismsg) {
+                $.ajax({
+                    url: "AuditList?guIds=" + guids.trim(','),
+                    type: "post",
+                    success: function (data) {
+                        if (data === "0") {
+                            for (var i in trall) {
+                                if (trall.hasOwnProperty(i)) {
+                                    trall[i].children().eq(0).children().prop("checked", false);
+                                    trall[i].children().eq(6).html("已发布");
+                                }
+                            }
+                        } else {
+                            alert("发布数据失败!请联系管理员!");
+                        }
+                    }
+                });
+            }
+        }
+
+    </script>
+</div>

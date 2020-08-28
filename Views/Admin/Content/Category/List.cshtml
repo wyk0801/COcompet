@@ -1,0 +1,268 @@
+﻿@{
+    ViewBag.Title = "List";
+    Layout = "~/Views/Shared/_ManagementLayout.cshtml";
+}
+<ol class="breadcrumb">
+    <li><a href="/Home/Index" target="_top">首页</a></li>
+    <li><a href="List">系统设置</a></li>
+    <li class="active">频道管理</li>
+</ol>
+<div class="container-fluid">
+    <div class="page-header page-header-mini">
+        <h4>频道列表 <small>The category list</small></h4>
+        <div class="btn-group btn-group-sm" role="group">
+            <a href="Add" role="button" onclick="" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> 添加</a>
+            <a href="javascript:;" role="button" onclick="DoSave()" class="btn btn-default"><span class="glyphicon glyphicon-floppy-save"></span> 保存</a>
+            <a href="javascript:;" role="button" onclick="clickAll(this)" checked class="btn btn-default"><span class="glyphicon glyphicon-check"></span> 全选</a>
+            <a href="javascript:" role="button" onclick="DoDelete(this)" class="btn btn-default"><span class="glyphicon glyphicon-trash"></span> 删除</a>
+        </div>
+    </div>
+    <div class="table-responsive">
+        <div id="grid"></div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    /*
+     *页面加载
+     **/
+    var grid;
+    $(document).ready(function () {
+        BindGrid();
+       
+    });
+    /*
+     * 绑定Grid
+     **/
+    var BindGrid = function () {
+        grid = $("#grid").kendoGrid({
+            dataSource: {
+                type: "json",
+                transport: {
+                    read: "GetCateList"
+                },
+                schema: {
+                    model: {
+                        fields: {
+                            category_id: { type: "category_id" },
+                            title: { type: "string" },
+                            page_size: { type: "number" },
+                            sort: { type: "number" },
+                            is_albums: { type: "string" },
+                            is_attach: { type: "string" }
+                        }
+                    }
+                },
+                pageSize: 10
+            },        
+            groupable: false,
+            sortable: true,
+            dataBound: function () {
+                $('[name=switch_album]').bootstrapSwitch({
+                    size: "small",
+                    onSwitchChange: function (event, state) {
+                        if (state === true) {
+                            $(this).val("1");
+                        } else {
+                            $(this).val("0");
+                        }
+                    }
+
+                });
+                $('[name=switch_attach]').bootstrapSwitch({      
+                    size: "small",
+                    onSwitchChange: function (event, state) {
+                        if (state === true) {
+                            $(this).val("1");
+                        } else {
+                            $(this).val("0");
+                        }
+                    }
+
+                });
+                $('[name=txt_sort]').kendoNumericTextBox({ format: "0", step: 1, min: 0 });
+                $('[name=txt_size]').kendoNumericTextBox({ format: "0 条", step: 1, min: 1 });
+            },
+            pageable: {
+                refresh: true,
+                pageSizes: true,
+                buttonCount: 5
+            },
+            columns: [
+            {
+                template: '<input type="checkbox" value="#=category_id#" class="checkbox" name="cId">',
+                title: '',
+                width: 30
+            }, {
+                field: "category_id",
+                title: "编号",
+                width: 100
+            }, {
+                field: "title",
+                title: "频道",
+                width:140
+            }, {
+                //field: "page_size",
+                title: "分页大小",
+                template: '<input type="number" value="#=page_size#" name="txt_size" style="width:100px;">',//#=page_size#
+                width: 150
+            }, {
+                //field: "sort",
+                title: "排序",
+                template: '<input type="number" name="txt_sort" value="#=sort#" style="width:100px;">',
+                width: 140
+            }, {
+                template: '#if(is_albums==0){#<input type="checkbox" value="0" name="switch_album"  data-size="small">#}' +
+                    'else{#<input type="checkbox" value="1" checked name="switch_album" data-size="small"># }#',
+                title: "是否开启相册",//<input type="checkbox" name="switch_album" checked data-size="small">
+                width: 140
+            }, {
+                title: "是否开启附件",
+                template: '#if(is_attach==0){#<input type="checkbox" name="switch_attach" value="0" data-size="small">#}' +
+                    'else{#<input type="checkbox" value="1" checked name="switch_attach" data-size="small"># }#',
+                width: 150
+            },
+            {
+                command: [
+                {
+                    name: "doEidt",
+                    text: "编辑",
+                    click: function (e) {
+                        var tr = $(e.target).closest("tr");
+                        var data = this.dataItem(tr);
+
+                        DoEdit(data.category_id);
+                    }
+                },
+                {
+                    name: "doDel",
+                    text: "删除",
+                    click: function (e) {
+                        var tr = $(e.target).closest("tr");
+                        var data = this.dataItem(tr);
+                        DoDel(data.category_id, tr);
+                    }
+                }],
+                title: "操作",
+                width: "250px"
+            }]
+        });
+    }
+
+    /*
+     *全选
+     **/
+    var clickAll = function (e) {
+        if ($(e).attr("checked")) {
+            $(".checkbox").each(function () {
+                $(this).prop("checked", true);//设置每一行选中
+                //$(this).closest("tr").addClass("k-state-selected");//给每一行添加选中样式
+            });
+
+            $(e).html("<span class='glyphicon glyphicon-check'></span>取消").removeAttr("checked");
+        } else {
+            $(".checkbox").each(function () {
+                $(this).prop("checked", false);//设置每一行不选中
+                //$(this).closest("tr").removeClass("k-state-selected");
+            });
+
+            $(e).html("<span class='glyphicon glyphicon-check'></span>全选").attr("checked", "checked");
+        }
+    }
+    /*
+     *多个删除
+     **/
+    var ids = [];
+    var DoDelete = function () {
+        $(".checkbox").each(function (index, cbx) {
+            if (cbx.checked) {
+                ids.push(cbx.value);
+            }
+        }); 
+        if (ids.length === 0) {
+            alert('请选择！');
+            return false;
+        }
+        var msg = confirm('确定要删除您选择的数据?');
+        if (msg) {    
+            $.post("/Category/AllDel?cateIds=" + ids, function (data) {
+                var result = eval('(' + data + ')');
+                if (result.Success > 0) {
+                    alert("成功删除" + result.Success + "条数据！");
+                    BindGrid();
+                    $("#grid").data("kendoGrid").refresh();
+                }
+                ids.length = 0;
+            });
+        }
+    }
+    /*
+     * 单个删除
+     **/
+    var DoDel = function (e) {
+
+        if (confirm('确定要删除?'))
+            $.post("/Category/Delete", { cateId: e }, function (data) {
+                if (parseInt(data) === 1) {
+                    alert('删除成功!');
+                    BindGrid();
+                    $("#grid").data("kendoGrid").refresh();
+                } else {
+                    alert('删除失败！');
+                }
+            });
+    }
+    /*
+     *编辑
+     **/
+    var DoEdit = function (e) {
+        window.location.href = "Edit/" + e;
+    }
+    /*
+     * 保存
+     **/
+    var DoSave = function () {
+
+        var array = [];
+
+        $('.checkbox').each(function (index, el) {
+
+            var categroyId = $(el).parent().siblings().eq(0).text();
+            var title = $(el).parent().siblings().eq(1).text();
+            var pageSize = $(el).parent().siblings().eq(2).find("input").eq(1).val();
+            var sort = $(el).parent().siblings().eq(3).find("input").eq(1).val();
+            var isAlbums = $(el).parent().siblings().eq(4).find("input").val();
+            var isAttach = $(el).parent().siblings().eq(5).find("input").val();
+
+           
+            array.push({
+                "category_id": categroyId,
+                "title": title,
+                "page_size": pageSize,
+                "sort": sort,
+                "is_albums": isAlbums,
+                "is_attach": isAttach
+            });
+        });
+       
+        $.ajax({
+            url: "AllSave",
+            type: "post",
+            async: true,
+            data: { "jsonData": JSON.stringify(array) },
+            dataType: "json",
+            success: function (data) {
+              
+            
+                alert('保存成功！');
+                BindGrid();
+            },
+            error: function () {
+
+            },
+            complete: function () {
+
+            }
+        });
+    }
+</script>

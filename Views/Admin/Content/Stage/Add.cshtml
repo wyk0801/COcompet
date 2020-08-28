@@ -1,0 +1,118 @@
+﻿@{
+    ViewBag.Title = "Add";
+    Layout = "~/Views/Shared/_ManagementLayout.cshtml";
+}
+@model ChuanYuan.Model.stage
+
+<ol class="breadcrumb">
+    <li><a href="/Home/Index" target="_top">首页</a></li>
+    <li><a href="List">活动阶段</a></li>
+    <li class="active">阶段编辑</li>
+</ol>
+<div class="container-fluid">
+    <div class="page-header page-header-mini">
+        编辑阶段信息
+    </div>
+    <!-- Nav tabs -->
+    <form class="form-horizontal" action="Add" method="POST" onsubmit="return check()">
+        <!-- Tab panes -->
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane fade in active" id="basic">
+                <br>
+                <div class="form-group">
+                    <label for="ssOrganization" class="col-sm-2 control-label">阶段所属</label>
+                    <div class="col-sm-4">
+                        @if (ViewBag.Admin == "1")
+                        {
+                            @Html.TextBoxFor(m => m.ssOrganization, new { @id = "ssOrganization", @placeholder = "阶段所属", @class = "form-control" })
+                        }
+                        else
+                        {
+                            @Html.TextBoxFor(m => m.ssOrganization, new { @id = "ssOrganization", @placeholder = "阶段所属", @class = "form-control", @readonly = "readonly" })
+                        }
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="title" class="col-sm-2 control-label">阶段名称</label>
+                    <div class="col-sm-4">
+                        @Html.TextBoxFor(c => c.title, new { @name = "title", @class = "form-control", @placeholder = "阶段名称" })
+                    </div>
+                    <p id="msgtitle"></p>
+                </div>
+                <div class="form-group">
+                    <label for="txt_group_name" class="col-sm-2 control-label">是否启用</label>
+                    <div class="btn-group col-sm-4" data-toggle="buttons">
+                        <label class="btn btn-primary">
+                            @Html.RadioButtonFor(c => c.isUse, 0, new { @id = "radio_sys_2", @name = "radio_sys", @checked = true })
+                            是
+
+                        </label>
+                        <label class="btn btn-primary">
+                            @Html.RadioButtonFor(c => c.isUse, 1, new { @id = "radio_sys_1", @name = "radio_sys" })
+                            否
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="sort" class="col-sm-2 control-label">排序</label>
+                    <div class="col-sm-4">
+                        @Html.TextBoxFor(m => m.sort, new { @class = "form-control", @id = "sort", @name = "sort", @placeholder = "排序",@Value="1" })
+                    </div>
+                    <p id="msgsort"></p>
+                </div>
+                @Html.HiddenFor(m => m.id, new { @class = "form-control", @id = "id", @name = "id" })
+
+            </div>
+        </div>
+
+        <div class="fixed-bottom container-submit">
+            <input type="hidden" name="actionEnum" id="actionEnum" value="@ViewData["ActionEnum"]" />
+            <button type="submit" class="btn btn-primary">提交保存</button>
+            <button type="button" onclick="javascript: history.back(-1);" class="btn btn-warning">返回</button>
+        </div>
+        <script>
+            var userExit = true;
+            $(document).ready(function() {
+                //单选增加样式
+                $('input[type="radio"]:checked').parent('label').addClass('active');
+                //获取图书馆组
+                $('#ssOrganization').kendoDropDownList({
+                    filter: "contains",
+                    dataTextField: "text",
+                    dataValueField: "value",
+                    index: 0,
+                    dataSource: {
+                        transport: {
+                            read: {
+                                dataType: "json",
+                                url: "/WisdomCompet/GetLibrary"
+                            }
+                        }
+                    }
+                });
+            });
+            
+            function check() {
+                var title = $("#title").val();
+                if (title === "") {
+                    $("#msgtitle").css({ color: "red" });
+                    $("#msgtitle").html("阶段名称不能为空！");
+                    userExit = false;
+                } else {
+                    $("#msgtitle").html("");
+                    userExit = true;
+                }
+                var sort = $("#sort").val();
+                if (sort === "") {
+                    $("#msgsort").css({ color: "red" });
+                    $("#msgsort").html("排序不能为空！");
+                    userExit = false;
+                } else {
+                    $("#msgsort").html("");
+                    userExit = true;
+                }
+            }
+        </script>
+    </form>
+
+</div>

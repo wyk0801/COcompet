@@ -1,0 +1,235 @@
+﻿@{
+    ViewBag.Title = "List";
+    Layout = "~/Views/Shared/_ManagementLayout.cshtml";
+}
+<ol class="breadcrumb">
+    <li><a href="/Home/Index" target="_top">首页</a></li>
+    <li><a href="List">类别管理</a></li>
+    <li class="active">类别列表</li>
+</ol>
+
+<div class="container-fluid">
+    <div class="page-header page-header-mini">
+        <h4>类别列表 <small>The type list</small></h4>
+        <div class="btn-group btn-group-sm" role="group">
+            <a href="Add?actionEnum=@ChuanYuan.Common.Enums.ActionEnum.Add&typeId=@ViewBag.categoryid" role="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> 添加</a>
+            @*<a href="javascipt:void(0)" onclick="DoSave()" role="button" class="btn btn-default" ><span class="glyphicon glyphicon-floppy-save"></span> 保存</a>*@
+            <a href="javascipt:void(0)" onclick="DoSelectAll(this)" role="button" checked class="btn btn-default"><span class="glyphicon glyphicon-check"></span> 全选</a>
+            <a href="javascipt:void(0)" onclick="DoDelete()" role="button" class="btn btn-default"><span class="glyphicon glyphicon-trash"></span> 删除</a>
+        </div>
+    </div>
+    <div id="example">
+        <div id="toolbar" class="toolbar"></div>
+        <div id="treelist"></div>
+        <script type="text/javascript">
+            var dataSource;
+            var ReaderDataSource = function () {
+                dataSource = new kendo.data.TreeListDataSource({
+                    transport: {
+                        read: {
+                            url: "GetTypesData",
+                            dataType: "json"
+                        }
+                    },
+                    schema: {
+                        model: {
+                            id: "typeId",
+                            fields: {
+                                typeId: { type: "number", field: "type_id", nullable: false },
+                                sort: { type: "number", field: "sort", nullable: false },
+                                title: { type: "string", field: "title", nullable: false },
+                                category_id: { type: "string", field: "category_id", nullable: false },
+                                parentId: { field: "parent_id", nullable: true }
+                            },
+                            expanded: true
+                        }
+                    },
+                    filter: { field: "category_id", operator: "contains", value: '@ViewBag.categoryid' }
+                });
+            }
+
+            var BindData = function () {
+                $("#treelist").kendoTreeList({
+                    dataBound: function () {
+                        $('[name=txt_sort]').kendoNumericTextBox({ format: "0", step: 1, min: 0 });
+                    },
+                    dataSource: dataSource,
+                    pageable: {
+                        refresh: true,
+                        pageSizes: true,
+                    },
+                    columns: [
+                        {
+                            template: '<input type="checkbox" class="checkbox" value="#=typeId#" name="cId">',
+                            title: '',
+                            width: 30
+                        },
+                        {
+                            field: "typeId",
+                            title: '编号',
+                            width: 80
+                        },
+                        { field: "title", expandable: true, title: "类别名称", width: 250 },
+                        { title: "排序", template: '#=loadSort(sort)#', width: 100 },
+                        {
+                            title: "操作",
+                            template: "<a class=\"k-button k-button-icontext\" onclick=\"DoSonAdd(#=typeId#) \"><span class=\"\"></span>添加子集</a><a  class=\"k-button k-button-icontext\" onclick=\"DoEdit(#=typeId#)\"><span class=\" \"></span>编辑</a>",
+                            width: 120
+                        }
+                    ]
+                });
+            }
+            var loadSort = function (val) {
+                // var resultStr = '<input type="number" id="txt_sort" name="txt_sort" value="' + val + '" style="width:80px;">';
+                var resultStr = val;
+                return resultStr;
+            }
+
+            $(document).ready(function () {
+                ReaderDataSource();
+                BindData();
+
+                $("#toolbar").kendoToolBar({
+                    items: [
+                        {
+                            template: "<input id='category'/>",
+                            overflow: "never"
+                        }
+                    ]
+                });
+
+                $("#category").kendoDropDownList({
+                    optionLabel: "请选择频道",
+                    dataTextField: "title",
+                    dataValueField: "cateId",
+                    dataSource: {
+                        transport: {
+                            read: {
+                                url: "GetcategoryList?categoryid=@ViewBag.categoryid",
+                                dataType: "json"
+                            }
+                        }
+                    },
+                    change: onChange
+                });
+            });
+        </script>
+        <script type="text/javascript">
+            /**
+            * 执行保存
+            **/
+            var DoSave = function () {
+                var array = [];
+
+                $('.checkbox').each(function (index, el) {
+
+                    var typeId = $(el).val();
+                    var sort = $(el).parent().siblings().eq(2).find("input").val();
+                    array.push({
+                        "typeId": typeId,
+                        "sort": sort
+                    });
+                });
+
+                $.ajax({
+                    url: "AllSave",
+                    type: "post",
+                    async: true,
+                    data: { "jsonData": JSON.stringify(array) },
+                    dataType: "json",
+                    success: function (data) {
+                        alert('保存成功！');
+                        ReaderDataSource();
+                    },
+                    error: function () {
+
+                    },
+                    complete: function () {
+
+                    }
+                });
+            }
+
+            /**
+            * 执行全选
+            **/
+            var DoSelectAll = function (e) {
+                if ($(e).attr('checked')) {
+                    $(".checkbox").each(function () {
+                        $(this).prop("checked", true); //此处设置每行的checkbox选中，必须用prop方法
+                    });
+                    $(e).html('<span class="glyphicon glyphicon-check"></span> 取消').removeAttr('checked');
+                } else {
+                    $(".checkbox").each(function () {
+                        $(this).prop("checked", false); //此处设置每行的checkbox不选中，必须用prop方法
+                    });
+                    $(e).html('<span class="glyphicon glyphicon-check"></span> 全选').attr('checked', 'checked');
+                }
+            }
+
+            /**
+           * 执行删除
+           **/
+            var DoDelete = function () {
+                var trall = [];
+                var typeIds = "";
+                var obj = document.getElementsByName("cId");
+                for (var o in obj) {
+                    if (obj.hasOwnProperty(o)) {
+                        if (obj[o].checked) {
+                            typeIds += obj[o].value + ',';
+                            trall.push($(obj[o]).closest("tr"));
+                        }
+                    }
+                }
+                if (typeIds === "") {
+                    alert("请选择数据后执行本次操作!");
+                    return;
+                }
+                var ismsg = confirm("删除后会删除相应的子频道！您确定要执行删除操作？");
+                if (ismsg) {
+                    $.ajax({
+                        url: "DeleteAll?typeIds=" + typeIds.trim(','),
+                        type: "post",
+                        success: function (data) {
+                            if (data === "0") {
+                                for (var i in trall) {
+                                    if (trall.hasOwnProperty(i)) {
+                                        trall[i].remove();
+                                    }
+                                }
+                            } else {
+                                alert("删除数据失败!请联系管理员!");
+                            }
+                        }
+                    });
+                }
+            }
+
+            /**
+           * 执行change
+           **/
+            var onChange = function () {
+                $("#treelist").data("kendoTreeList").dataSource.filter();
+                var val = $("#category").val();
+                if (val === "")
+                    val = "@ViewBag.categoryid";
+                $("#treelist").data("kendoTreeList").dataSource.filter({ field: "category_id", operator: "contains", value: val });
+            }
+
+            /**
+            * 执行编辑
+            **/
+            var DoEdit = function (typeId) {
+                window.location.href = "Add?actionEnum=@ChuanYuan.Common.Enums.ActionEnum.Edit&typeId=" + typeId;
+            }
+
+            /**
+            * 执行添加子级
+            **/
+            var DoSonAdd = function (typeId) {
+                window.location.href = "Add?actionEnum=@ChuanYuan.Common.Enums.ActionEnum.Add&typeId=" + typeId;
+            }
+        </script>
+    </div>
+</div>

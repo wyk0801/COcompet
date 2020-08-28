@@ -1,0 +1,241 @@
+﻿@{
+    ViewBag.Title = "Add";
+    Layout = "~/Views/Shared/_ManagementLayout.cshtml";
+}
+@model ChuanYuan.Model.questions
+<link href="/Content/Bootstrap/css/bootstrap-tokenfield.min.css" rel="stylesheet">
+<link href="/Content/icheck/skins/square/blue.css" rel="stylesheet">
+<script src="/Scripts/Jquery/jquery-ui.min.js"></script>
+<script src="/Scripts/Bootstrap/bootstrap-tokenfield.min.js"></script>
+<script src="/Scripts/Jquery/jquery.icheck.min.js"></script>
+
+<ol class="breadcrumb">
+    <li><a href="/admin/">首页</a></li>
+    <li><a href="List">题库管理</a></li>
+    <li class="active">题目编辑</li>
+</ol>
+<div class="container-fluid">
+    <div class="page-header page-header-mini">
+        编辑题目
+    </div>
+    <form class="form-horizontal" action="Add" method="POST" onsubmit="return check()">
+        <div class="form-group">
+            <label for="txt_question" class="col-sm-2 control-label">题干</label>
+            <div class="col-sm-4">
+                <input type="text" class="form-control" id="txt_question" name="txt_question" placeholder="题干">
+            </div>
+            <p id="msgquestion"></p>
+        </div>
+        <div class="form-group">
+            <label for="sel_type" class="col-sm-2 control-label">类别</label>
+            <div class="col-sm-4">
+                <input type="text" id="sel_type" name="sel_type" placeholder="请选择题目类别">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="sel_type_enum" class="col-sm-2 control-label">题型</label>
+            <div class="col-sm-4">
+                <input type="text" id="sel_type_enum" name="sel_type_enum" placeholder="请选择题型">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="sel_read_level" class="col-sm-2 control-label">阅读级别</label>
+            <div class="col-sm-4">
+                <input type="number" id="sel_read_level" name="sel_read_level" value="1">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="txt_price" class="col-sm-2 control-label">价格</label>
+            <div class="col-sm-4">
+                <input type="number" id="txt_price" name="txt_price" placeholder="入库数量" value="0.00">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="sel_star_level" class="col-sm-2 control-label">难度</label>
+            <div class="col-sm-4">
+                <input type="text" id="sel_star_level" name="sel_star_level" placeholder="难度选择">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="txt_score" class="col-sm-2 control-label">分值</label>
+            <div class="col-sm-4">
+                <input type="number" id="txt_score" name="txt_score" placeholder="分值" value="10">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="txt_link_url" class="col-sm-2 control-label">链接地址</label>
+            <div class="col-sm-4">
+                <input type="text" class="form-control" id="txt_link_url" name="txt_link_url" placeholder="请输入题目相关链接地址">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="txt_tags" class="col-sm-2 control-label">相关标签</label>
+            <div class="col-sm-4">
+                <input type="text" id="txt_tags" name="txt_tags" data-role="tagsinput" placeholder="回车添加标签" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="txt_options_1" class="col-sm-2 control-label">答案选项</label>
+            <div class="col-sm-4">
+                <div class="input-group">
+                    <span class="input-group-addon">A</span>
+                    <input type="text" id="txt_options_1" name="txt_options_1" class="form-control" placeholder="选项1">
+                    <span class="input-group-addon addon-mini-padding"><input type="radio" id="rad_options_1" name="question_options" checked="checked" value="1"></span>
+                  
+                </div>
+                <span id="msgQuestionA"></span>
+                <br>
+                <div class="input-group">
+                    <span class="input-group-addon">B</span>
+                    <input type="text" id="txt_options_2" name="txt_options_2" class="form-control" placeholder="选项2">
+                    <span class="input-group-addon addon-mini-padding"><input type="radio" id="rad_options_2" name="question_options" value="2"></span>
+                
+                </div>
+                <span id="msgQuestionB"></span>
+                <br>
+                <div class="input-group">
+                    <span class="input-group-addon">C</span>
+                    <input type="text" id="txt_options_3" name="txt_options_3" class="form-control" placeholder="选项3">
+                    <span class="input-group-addon addon-mini-padding"><input type="radio" id="rad_options_3" name="question_options" value="3"></span>
+                
+                </div>
+                <span id="msgQuestionC"></span>
+                <br>
+                <div class="input-group">
+                    <span class="input-group-addon">D</span>
+                    <input type="text" id="txt_options_4" name="txt_options_4" class="form-control" placeholder="选项4">
+                    <span class="input-group-addon addon-mini-padding"><input type="radio" id="rad_options_4" name="question_options" value="4"></span>
+                
+                </div>
+                <span id="msgQuestionD"></span>
+                <br>
+            </div>
+        </div>
+        <div class="fixed-bottom container-submit">
+            <button type="submit" class="btn btn-primary">提交保存</button>
+            <button type="button" onclick="javascript: history.back(-1);" class="btn btn-warning">返回</button>
+        </div>
+        <script>
+            $(document).ready(function () {
+                /*选择题目类别*/
+                $("#sel_type").kendoDropDownList({
+                    dataTextField: "text",
+                    dataValueField: "value",
+                    dataSource: {
+                        transport: {
+                            read: {
+                                url: "GetQuestionsList",
+                                dataType: "json"
+                            }
+                        }
+                    },
+                    index: 0
+                });
+
+                /*选择题型*/
+                $("#sel_type_enum").kendoDropDownList({
+                    dataTextField: "text",
+                    dataValueField: "value",
+
+                    dataSource: {
+                        transport: {
+                            read: {
+                                dataType: "json",
+                                url: "ProblemType"
+                            }
+                        }
+                    },
+                    index: 0
+                });
+
+                /*选择题型*/
+                $("#sel_star_level").kendoDropDownList({
+                    dataTextField: "text",
+                    dataValueField: "value",
+                    dataSource: {
+                        transport: {
+                            read: {
+                                dataType: "json",
+                                url: "ProblemDifficulty"
+                            }
+                        }
+                    },
+                    index: 1
+                });
+
+                $('#txt_tags').tokenfield();
+                $("#sel_read_level").kendoNumericTextBox({ format: "0 级", step: 1, min: 1, max: 10 });
+                $("#txt_price").kendoNumericTextBox({ format: "#.00 元", min: 0 });
+                $("#txt_score").kendoNumericTextBox({ format: "#分", min: 0, step: 5 });
+                $("[name='question_options']").iCheck({
+                    checkboxClass: 'icheckbox_square-blue',
+                    radioClass: 'iradio_square-blue',
+                    increaseArea: '20%'
+                });
+            });
+            //数据验证
+            var checkQuestion = false;
+            var checkQuestionA = false;
+            var checkQuestionB = false;
+            var checkQuestionC = false;
+            var checkQuestionD = false;
+            function check() {
+
+                //题干
+                var txt_question = $("#txt_question").val();
+                if (txt_question == "") {
+                    $("#msgquestion").css({ color: "red" });
+                    $("#msgquestion").html("请输入题干！");
+                    checkQuestion = false;
+                } else {
+                    $("#msgquestion").html("");
+                    checkQuestion = true;
+                }
+                //答案a
+                var txt_options_1 = $("#txt_options_1").val();
+                if (txt_options_1 == "") {
+                    $("#msgQuestionA").css({ color: "red" });
+                    $("#msgQuestionA").html("请输入答案选项A！");
+                    checkQuestionA = false;
+                } else {
+                    $("#msgQuestionA").html("");
+                    checkQuestionA = true;
+                }   //答案b
+                var txt_options_2 = $("#txt_options_2").val();
+                if (txt_options_2 == "") {
+                    $("#msgQuestionB").css({ color: "red" });
+                    $("#msgQuestionB").html("请输入答案选项B！");
+                    checkQuestionB = false;
+                } else {
+                    $("#msgQuestionB").html("");
+                    checkQuestionB = true;
+                }     //答案C
+                var txt_options_3 = $("#txt_options_3").val();
+                if (txt_options_3 == "") {
+                    $("#msgQuestionC").css({ color: "red" });
+                    $("#msgQuestionC").html("请输入答案选项C！");
+                    checkQuestionC = false;
+                } else {
+                    $("#msgQuestionC").html("");
+                    checkQuestionC = true;
+                }
+                //答案ｂ
+                var txt_options_4 = $("#txt_options_4").val();
+                if (txt_options_4 == "") {
+                    $("#msgQuestionD").css({ color: "red" });
+                    $("#msgQuestionD").html("请输入答案选项D！");
+                    checkQuestionD = false;
+                } else {
+                    $("#msgQuestionD").html("");
+                    checkQuestionD = true;
+                }
+                if (checkQuestion && checkQuestionA && checkQuestionB && checkQuestionC && checkQuestionD) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        </script>
+    </form>
+</div>

@@ -1,0 +1,113 @@
+﻿@{
+    ViewBag.Title = "Add";
+    Layout = "~/Views/Shared/_ManagementLayout.cshtml";
+}
+@model ChuanYuan.Model.category
+<ol class="breadcrumb">
+    <li><a href="/Home/Index" target="_top">首页</a></li>
+    <li><a href="List">系统设置</a></li>
+    <li class="active">频道编辑</li>
+</ol>
+
+<div class="container-fluid">
+    <div class="page-header page-header-mini">
+        编辑频道
+    </div>
+    <!-- Nav tabs -->
+    <form class="form-horizontal" action="@Url.Action("DoPost")/@ViewBag.Action" method="POST">
+        <!-- Tab panes -->
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane fade in active" id="basic">
+                <br>
+                <div class="form-group">
+                    <label for="txt_title" class="col-sm-2 control-label">频道标题</label>
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control" id="txt_title" name="title" placeholder="频道标题" value="@Model.title">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="txt_category_id" class="col-sm-2 control-label">频道ID</label>
+                    <div class="col-sm-4">
+
+                        @if (Model.title != null)
+                        {
+                            <input type="text" class="form-control" id="txt_category_id" name="category_id" readonly="readonly" placeholder="频道ID" value="@Model.category_id">
+                        }
+                        else
+                        {
+                            <input type="text" class="form-control" id="txt_category_id" name="category_id" placeholder="频道ID" value="@Model.category_id" />
+                        }
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="txt_page_size" class="col-sm-2 control-label">分页大小</label>
+                    <div class="col-sm-4">
+                        <input type="number" id="txt_page_size" name="page_size" placeholder="分页大小" value="@Model.page_size">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="txt_page_size" class="col-sm-2 control-label">排序</label>
+                    <div class="col-sm-4">
+                        <input type="number" id="txt_sort" name="sort" placeholder="排序" value="@Model.sort">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="switch_album" class="col-sm-2 control-label">开启相册</label>
+                    <div class="col-sm-4">
+                        <input type="checkbox" id="switch_album" name="is_albums" value="@Model.is_albums" data-size="small" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="switch_attach" class="col-sm-2 control-label">开启附件</label>
+                    <div class="col-sm-4">
+                        <input type="checkbox" id="switch_attach" name="is_attach" value="@Model.is_attach" data-size="small">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="fixed-bottom container-submit">
+            <button type="submit" class="btn btn-primary">提交保存</button>
+            <button type="button" onclick="javascript: history.back(-1);" class="btn btn-warning">返回</button>
+        </div>
+
+    </form>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $('input[type=checkbox][value=1]').attr("checked", "checked");
+        $('#txt_page_size').kendoNumericTextBox({ format: '0 条', min: 0 });
+        $('#txt_sort').kendoNumericTextBox({ format: '0', min: 1 });
+        $('#switch_album').bootstrapSwitch({
+            size: "small",
+            onSwitchChange: function (event, state) {
+                if (state === true) {
+                    $(this).val("1");
+                } else {
+                    $(this).val("2");
+                }
+            }
+
+        });
+        $('#switch_attach').bootstrapSwitch({
+            size: "small",
+            onSwitchChange: function (event, state) {
+                if (state === true) {
+                    $(this).val("1");
+                } else {
+                    $(this).val("2");
+                }
+            }
+        });
+
+        $("#txt_title").blur(function () {
+
+            var title = $("#txt_title").val();
+            $.post("GetCateId", { mytitle: title }, function (data) {
+                $("#txt_category_id").val(data);
+            });
+        });
+    });
+</script>

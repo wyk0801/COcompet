@@ -1,0 +1,324 @@
+﻿@using System.Configuration
+@model ChuanYuan.Model.compet
+@{
+    ViewBag.Title = "List";
+    Layout = "~/Views/Shared/_ManagementLayout.cshtml";
+}
+<script src="~/Scripts/layer/layer.js"></script>
+<link href="~/Scripts/layer/skin/default/layer.css" rel="stylesheet" />
+
+<style>
+    .imgcode {
+        position: relative;
+        left: 150px;
+        top: 50px;
+    }
+</style>
+<ol class="breadcrumb">
+    <li><a href="/Home/Index" target="_top">首页</a></li>
+    <li><a href="List">知识大赛</a></li>
+    <li class="active">大赛列表</li>
+</ol>
+<div class="container-fluid">
+    <div class="page-header page-header-mini">
+        <h4>大赛列表 <small>The competition list</small></h4>
+        <div class="btn-group btn-group-sm" role="group">
+            <a href="Add?id=@Model.compet_id" role="button" onclick="" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> 添加</a>
+
+        </div>
+    </div>
+    <script type="text/javascript">
+        var grid;
+
+        $(document).ready(function () {
+            BindToolBar();
+            $("input").placeholder();
+            kendo.culture("zh-CN");
+            BindGrid();
+        });
+
+        function DoCancle(e) {
+            if (confirm("您确定要取消该大赛吗？")) {
+                $.get("Cancle?id=" + e+"&state=0",
+                    function (data) {
+                        if (data === "1") {
+                            alert('取消大赛成功!');
+                            window.location.reload();
+                        }
+                    });
+            } else {
+                alert('执行取消操作');
+            }
+        }
+
+
+        function DoExportCompetInfo(e) {
+            window.location.href = "/Admin/Content/WisdomCompet/ExportCompetInfo?compet_id=" + e;
+        }
+
+
+        function InfoCode(e) {
+            if (confirm("您确定要查看二维码到桌面吗？")) {
+                $.get("InfoCode?code=" + e,
+                    function (data) {
+                        if (data === "1") {
+                            alert('下载成功!');
+                        }
+                    });
+            }
+        }
+
+        //全选
+        function clickAll(e) {
+            if ($(e).attr('checked')) {
+                $(".checkbox").each(function () {
+                    $(this).prop("checked", true); //此处设置每行的checkbox选中，必须用prop方法
+                    $(this).closest("tr").addClass("k-state-selected"); //设置grid 每一行选中
+                });
+                $(e).html('<span class="glyphicon glyphicon-check"></span> 取消').removeAttr('checked');
+            } else {
+                $(".checkbox").each(function () {
+                    $(this).prop("checked", false); //此处设置每行的checkbox不选中，必须用prop方法
+                    $(this).closest("tr").removeClass("k-state-selected"); //设置grid 每一行不选中
+                });
+                $(e).html('<span class="glyphicon glyphicon-check"></span> 全选').attr('checked', 'checked');
+            }
+        }
+
+        var BindGrid = function () {
+            grid = $("#grid").kendoGrid({
+                dataSource: {
+                    type: "json",
+                    transport: {
+                        read: "GetCompetList"
+                    },
+                    schema: {
+                        model: {
+                            fields: {
+                                compet_id: { type: "number" },
+                                title: { type: "string" },
+                                state: { type: "number" },
+                                age_limit: { type: "string" },
+                                gender_limit: { type: "string" },
+                                region_limit: { type: "number" },
+                                max_persons: { type: "number" },
+                                begin_time: { type: "date" },
+                                end_time: { type: "date" }
+                            }
+                        }
+                    },
+                    pageSize: 10
+                },
+                groupable: false,
+                sortable: true,
+                pageable: {
+                    refresh: true,
+                    pageSizes: true,
+                    buttonCount: 5
+                },
+                columns: [
+                    {
+                        field: "compet_id",
+                        title: "编号",
+                        width: 100
+                    },
+                    {
+                        template: '#if(sub_title.length==0) {# #=title# #}else{ # #=title#-#=sub_title# # }#',
+                        title: "大赛",
+                        width: 160
+                    }, {
+
+                        field: "state",
+                        title: "状态",
+                        width: 90,
+                        values: [
+                            { text: "正常", value: 1 },
+                            { text: "冻结", value: 0 }
+                        ]
+                    }, {
+                        field: "gender_limit",
+                        title: "性别要求",
+                        width: 90
+                    }, {
+                        field: "region_limit",
+                        title: "规模",
+                        width: 90,
+                        values: [
+                            { text: "全国", value: "1" },
+                            { text: "全省", value: "2" },
+                            { text: "全市", value: "3" },
+                            { text: "县区", value: "4" },
+                            { text: "内部", value: "5" }
+                        ]
+                    }, {
+                        title: "最大人数",
+                        template: '#if(max_persons==0) {# 不限 #}else{ # #=max_persons# 人 # }#',
+                        width: 90
+                    }, {
+                        field: "group_name",
+                        title: "大赛所属",
+                        width: 100
+                    }, {
+                        field: "begin_time",
+                        format: '{0:yyyy-MM-dd}',
+                        title: "比赛时间",
+                        width: 100
+                    }, {
+                        field: "end_time",
+                        format: '{0:yyyy-MM-dd}',
+                        title: "结束时间",
+                        width: 100
+                    }, {
+                        title: "操作",
+                        template:
+                            "<a class=\"k-button k-button-icontext\" href='Add?id=#=compet_id#'><span class=\" \"></span>编辑</a>" +
+                                "<a class=\"k-button k-button-icontext\" onclick=\"DoCancle('#=compet_id#')\"><span class=\" \"></span>取消</a>" +
+                                "<a class=\"k-button k-button-icontext\" href='@ConfigurationManager.AppSettings["Zs"]/Account/Start/#=des_compet_id#' target=\"_blank\" ><span class=\" \"></span>活动地址</a>" +
+                                "#if(compet_id=='50509'||compet_id=='10176'||compet_id=='10177'||compet_id=='10178'){#<a class=\"k-button k-button-icontext\" onclick=\"DoExportCompetInfo('#=compet_id#')\"><span class=\" \"></span>导出排行信息</a>#}#" +
+                                //"<a class=\"k-button k-button-icontext\" onclick=\"DoExportCompetInfo('#=compet_id#')\"><span class=\" \"></span>导出排行信息</a>" +
+                                "<a class='k-button k-button-icontext'  target=\"_blank\"  href='/Admin/System/QrCode/Index?qrcode=@ConfigurationManager.AppSettings["Zs"]/Account/Start/#=des_compet_id#&co=#=des_compet_id#&type=Zs&competName=#=title#'>查看二维码</a>",
+                        width: 280
+                    }
+                ]
+            });
+        }
+
+                var BindToolBar = function () {
+                    $("#toolbar")
+                        .kendoToolBar({
+                            items: [
+                                {
+                                    template: "<input id='ddlState' placeholder='大赛状态' />",
+                                    overflow: "never"
+                                }, {
+                                    template: "<input id='ddlRegion' placeholder='大赛规模' />",
+                                    overflow: "never"
+                                }, {
+                                    template: "<input id='txtBegintime' name='txtBegintime' placeholder='开赛时间'>",
+                                    overflow: "never"
+                                }, {
+                                    template: "<input id='txtEndtime' name='txtEndtime' placeholder='结束时间'>",
+                                    overflow: "never"
+                                }, {
+                                    template: "<input id='txtTitle' name='txtTitle' placeholder='请输入大赛名称' />",
+                                    overflow: "never"
+                                }, {
+                                    type: "button",
+                                    text: "搜索",
+                                    click: function () {
+                                        var orfilter = { logic: "and", filters: [] };
+                                        var ddlState = $("#ddlState").val(); //大赛状态
+                                        var txtTitle = $('#txtTitle').val(); //大赛名称
+                                        var ddlRegion = $('#ddlRegion').val(); //规模
+                                        var txtBegintime = $('#txtBegintime').val(); //开始
+                                        var txtEndtime = $('#txtEndtime').val(); //结束
+
+                                        if (ddlState) {
+                                            orfilter.filters.push({ field: "state", operator: "eq", value: parseInt(ddlState) });
+                                        }
+                                        if (txtTitle) {
+                                            orfilter.filters.push({ field: "title", operator: "contains", value: txtTitle });
+                                        }
+                                        if (ddlRegion) {
+                                            orfilter.filters.push({
+                                                field: "region_limit",
+                                                operator: "eq",
+                                                value: parseInt(ddlRegion)
+                                            });
+                                        }
+                                        if (txtBegintime) {
+                                            orfilter.filters.push({
+                                                field: "begin_time",
+                                                operator: "gte",
+                                                value: Date
+                                                    .parse(txtBegintime)
+                                            });
+                                        }
+                                        if (txtEndtime) {
+                                            orfilter.filters.push({
+                                                field: "end_time",
+                                                operator: "lte",
+                                                value: Date.parse(txtEndtime)
+                                            });
+                                        }
+
+                                        if (orfilter.filters.length > 0) {
+                                            grid.data("kendoGrid").dataSource.filter(orfilter);
+                                        } else {
+                                            grid.data("kendoGrid").dataSource.filter({});
+                                        }
+                                    }
+                                }
+                            ]
+                        });
+                    $("#ddlState").kendoDropDownList({
+                        optionLabel: "状态选择",
+                        dataTextField: "text",
+                        dataValueField: "value",
+                        dataSource: [
+                            { text: "正常", value: "1" },
+                            { text: "冻结", value: "0" }
+                        ]
+                    });
+                    $("#ddlRegion")
+                        .kendoDropDownList({
+                            optionLabel: "规模选择",
+                            dataTextField: "text",
+                            dataValueField: "value",
+                            dataSource: {
+                                transport: {
+                                    read: {
+                                        dataType: "json",
+                                        url: "RegionType"
+                                    }
+                                }
+                            }
+                        });
+
+                    $("#txtBegintime").kendoDatePicker({ format: 'yyyy-MM-dd HH:mm:ss' });
+                    $("#txtEndtime").kendoDatePicker({ format: 'yyyy-MM-dd HH:mm:ss' });
+                    $('#txtTitle').kendoMaskedTextBox();
+                }
+
+
+                var DownLoadCode = function (e) {
+                    $.ajax({
+                        type: "post",
+                        url: "InfoCode",
+                        data: { code: '@ConfigurationManager.AppSettings["Zs"]/Account/Start/' + e },
+                        dataType: "text",
+                        success: function (data) {
+                            layer.open({
+                                type: 1,
+                                title: '二维码(点击下载)',
+                                maxmin: false,
+                                shade: 0.3,
+                                fixed: false,
+                                resize: false,
+                                shadeClose: false, //点击遮罩关闭层
+                                area: ['599px', '439px'],
+                                content: "<div id='imgdiv'><a href='" + data + "' alt='点击图片下载二维码' download='二维码.jpg'><img id='imgcode'  class='imgcode'  src='" + data + "'/></a></div>",
+                                cancel: function () {
+                                    $.ajax({
+                                        url: "DeleteCode",
+                                        type: "post",
+                                        dataType: "json",
+                                        async: false,
+                                        data: { url: data },
+                                        success: function (data) {
+
+                                        }, error: function () {
+
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    });
+                }
+    </script>
+    <div class="table-responsive">
+        <div id="toolbar" class="toolbar"></div>
+        <div id="grid"></div>
+    </div>
+</div>
